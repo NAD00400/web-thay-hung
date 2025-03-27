@@ -28,4 +28,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
     }
 }
-
+function generateSlug(ten_danh_muc: string): string {
+    return ten_danh_muc
+        .toLowerCase()
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-');
+}
