@@ -1,103 +1,65 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    switch (req.method) {
-        case 'GET':
-            return getSoDo(req, res);
-        case 'POST':
-            return createSoDo(req, res);
-        case 'DELETE':
-            return deleteSoDo(req, res);
-        case 'PUT':
-            return updateSoDo(req, res);
-        default:
-            res.setHeader('Allow', ['GET', 'POST']);
-            res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
-}
-
-async function getSoDo(req: NextApiRequest, res: NextApiResponse) {
+// GET handler
+export async function GET() {
     try {
         const soDo = await prisma.soDoDatMay.findMany();
-        res.status(200).json(soDo);
+        return NextResponse.json(soDo, { status: 200 });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch soDo' });
+        return NextResponse.json({ error: 'Failed to fetch soDo' }, { status: 500 });
     }
 }
 
-async function updateSoDo(req: NextApiRequest, res: NextApiResponse) {
+// POST handler
+export async function POST(req: NextRequest) {
     try {
-        const { id } = req.query;
-        const updatedData = req.body;
-        const updatedSoDo = await prisma.soDoDatMay.update({
-            where: { ma_so_do: id as string },
-            data: updatedData,
-        });
-        res.status(200).json(updatedSoDo);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to update soDo' });
-    }
-}
-
-async function deleteSoDo(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        const { id } = req.query;
-        await prisma.soDoDatMay.delete({
-            where: { ma_so_do: id as string },
-        });
-        res.status(204).end();
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to delete soDo' });
-    }
-}
-
-async function createSoDo(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        const { 
-            vong_nguc,
-            vong_co,
-            vong_eo,
-            be_ngang_vai,
-            vong_hong,
-            chieu_dai_ao,        
-            chieu_dai_tu_vai_toi_eo, 
-            chieu_dai_tay_ao  ,      
-            vong_bap_tay,            
-            vong_khuy_tay,          
-            vong_co_tay,             
-            chieu_dai_quan,          
-            createdAt,               
-            vong_dui,                
-            vong_dau_goi,            
-            vong_ong_quan,
-            ma_chi_tiet_don_hang,           
-} = req.body;
+        const {
+            ma_chi_tiet_don_hang,
+                be_ngang_vai,
+                chieu_dai_ao,
+                chieu_dai_quan,
+                chieu_dai_tay_ao,
+                chieu_dai_tu_vai_toi_eo,
+                vong_bap_tay,
+                vong_eo,
+                vong_co,
+                vong_hong,
+                vong_nguc,
+                vong_co_tay,
+                vong_dui,
+                vong_khuy_tay,
+                vong_dau_goi,
+                vong_ong_quan,
+        } = await req.json();
         const newSoDo = await prisma.soDoDatMay.create({
             data: {
-                vong_nguc,
-                vong_co,
-                vong_eo,
                 be_ngang_vai,
+                chieu_dai_ao,
+                chieu_dai_quan,
+                chieu_dai_tay_ao,
+                chieu_dai_tu_vai_toi_eo,
+                vong_bap_tay,
+                vong_eo,
+                vong_co,
+                vong_nguc,
+                vong_co_tay,
+                vong_dui,
                 vong_hong,
-                chieu_dai_ao,        
-                chieu_dai_tu_vai_toi_eo, 
-                chieu_dai_tay_ao,      
-                vong_bap_tay,            
-                vong_khuy_tay,          
-                vong_co_tay,             
-                chieu_dai_quan,          
-                createdAt,               
-                vong_dui,                
-                vong_dau_goi,            
-                vong_ong_quan,           
-                ma_chi_tiet_don_hang,
+                vong_khuy_tay,
+                vong_dau_goi,
+                vong_ong_quan,
+                chi_tiet_don_hang:{
+                    connect:{
+                        ma_chi_tiet_don_hang: ma_chi_tiet_don_hang}
+                },
             },
         });
-        res.status(201).json(newSoDo);
+        return NextResponse.json(newSoDo, { status: 201 });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create soDo' });
+        return NextResponse.json({ error: 'Failed to create soDo' }, { status: 500 });
     }
 }
+
