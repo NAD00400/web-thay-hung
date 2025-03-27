@@ -6,11 +6,11 @@ async function main() {
   // 🌱 Tạo dữ liệu giả cho bảng nguoi_dung
   const user = await prisma.nguoiDung.create({
     data: {
-      email_nguoi_dung: "user22@example.com",
+      email_nguoi_dung: "user222222@example.com",
       ten_nguoi_dung: "Nguyen Van A",
       vai_tro: "KHACH_HANG",
       link_anh_dai_dien: "https://example.com/avatar.jpg",
-      firebaseId: "firebase1244",
+      firebaseId: "firebase124422",
     },
   });
 
@@ -48,7 +48,7 @@ async function main() {
   const cart = await prisma.gioHang.create({
     data: {
       ma_khach_hang: customer.ma_khach_hang,
-      customerId: "customer123",
+       // Replace with the appropriate value
     },
   });
 

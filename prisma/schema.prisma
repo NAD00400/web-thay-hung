@@ -107,7 +107,6 @@ model GiaoHang {
 model GioHang {
   ma_gio_hang   String   @id @default(uuid())
   ma_khach_hang String
-  customerId    String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now())
 
@@ -148,7 +147,7 @@ model LichHenKhachHang {
   ngay_hen      DateTime
   ngay_tao      DateTime
   trang         String
-
+  
   khach_hang KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang])
 }
 
