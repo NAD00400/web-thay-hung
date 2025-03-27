@@ -2,7 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-
+// GET API
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+    const maGiaoHang = searchParams.get('ma-giao-hang');
+    try {
+        if (maGiaoHang) {
+            const giaoHang = await prisma.giaoHang.findUnique({
+                where: {
+                    ma_giao_hang: maGiaoHang,
+                },
+            });
+            if (!giaoHang) {
+                return NextResponse.json({ error: 'Record not found' }, { status: 404 });
+            }
+            return NextResponse.json(giaoHang);
+        } else {
+            const giaoHangs = await prisma.giaoHang.findMany();
+            return NextResponse.json(giaoHangs);
+        }
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to fetch records', details: error }, { status: 500 });
+    }
+}
 // DELETE API
 export async function DELETE(req: NextRequest, ) {
     

@@ -48,7 +48,6 @@ async function main() {
   const cart = await prisma.gioHang.create({
     data: {
       ma_khach_hang: customer.ma_khach_hang,
-       // Replace with the appropriate value
     },
   });
 

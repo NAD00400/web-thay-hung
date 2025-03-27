@@ -2,7 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+// GET API
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+    const maChiTiet = searchParams.get('ma-chi-tiet');
+    try {
+        const record = await prisma.chiTietDonHang.findUnique({
+            where: {
+                ma_chi_tiet_don_hang: maChiTiet || undefined,
+            },
+        });
 
+        if (!record) {
+            return NextResponse.json({ error: 'Record not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: 'Record retrieved successfully', record });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to retrieve record', details: error }, { status: 500 });
+    }
+}
 // DELETE API
 export async function DELETE(req: NextRequest, ) {
     
