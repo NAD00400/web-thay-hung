@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +29,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <header className="bg-white shadow-md py-4 opacity-70 fixed top-0 left-0 w-full backdrop-blur-md z-50 transition-all duration-300">
+        <div className="container mx-auto flex justify-between items-center px-4">
+          <h1 className="text-xl font-bold text-gray-800">Nhà May Thiên Kim</h1>
+          <nav>
+            <ul className="flex space-x-6">
+              <li><Link href="/" className="text-gray-700 hover:text-neutral-900">Trang Chủ</Link></li>
+              <li><Link href="/san-pham" className="text-gray-700 hover:text-neutral-900">Sản Phẩm</Link></li>
+              <li><Link href="/cua-hang" className="text-gray-700 hover:text-neutral-900">Cửa hàng</Link></li>
+              <li><Link href="/lien-he" className="text-gray-700 hover:text-neutral-900">Liên Hệ</Link></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+      
         {children}
+        <footer className="bg-neutral-20000  text-neutral-900 py-6 text-center h-24">
+        <p>&copy; {new Date().getFullYear()} My Website. All Rights Reserved.</p>
+      </footer>
       </body>
     </html>
   );
