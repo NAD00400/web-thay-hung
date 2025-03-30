@@ -1,29 +1,39 @@
 'use client'
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 export default function DangKyPage() {
-    
     const [formData, setFormData] = useState({
         email_nguoi_dung: "",
         ten_nguoi_dung: "",
         sdt: "",
         mk1: "",
         mk2: "",
+        captcha: "",
+        generatedCaptcha: "",
     });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    const generateCaptcha = () => {
+        return Math.random().toString(36).substring(2, 8).toUpperCase();
+    };
+
+    useEffect(() => {
+        setFormData((prev) => ({ ...prev, generatedCaptcha: generateCaptcha() }));
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setError("");
@@ -48,81 +58,55 @@ export default function DangKyPage() {
                 sdt: "",
                 mk1: "",
                 mk2: "",
+                captcha: "",
+                generatedCaptcha: generateCaptcha(),
             });
-        } catch (error: any) {
-            setError(error.message);
+        } catch (error) {
+            setError(error instanceof Error ? error.message : "Đã xảy ra lỗi không xác định.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <Card className="max-w-md w-full shadow-lg p-6 bg-white rounded-lg">
+        <div className="flex justify-center items-center min-h-screen bg-gray-100 mt-4">
+            <Card className="max-w-md w-full shadow-sm p-6 bg-white rounded-lg">
                 <CardHeader>
-                    <h1 className="text-xl font-bold text-center ">Đăng Ký Người Dùng</h1>
+                    <h1 className="text-xl font-bold text-center">Đăng Ký Người Dùng</h1>
                 </CardHeader>
                 <CardContent>
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        
                         <div>
-                            <Label htmlFor="ten_nguoi_dung" className='pl-1 mb-2'>Tên Người Dùng</Label>
-                            <Input
-                                type="text"
-                                id="ten_nguoi_dung"
-                                name="ten_nguoi_dung"
-                                value={formData.ten_nguoi_dung}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Label htmlFor="ten_nguoi_dung">Tên Người Dùng</Label>
+                            <Input type="text" id="ten_nguoi_dung" name="ten_nguoi_dung" value={formData.ten_nguoi_dung} onChange={handleChange} required />
                         </div>
                         <div>
-                            <Label htmlFor="email_nguoi_dung" className='pl-1 mb-2'>Email</Label>
-                            <Input
-                                type="email"
-                                id="email_nguoi_dung"
-                                name="email_nguoi_dung"
-                                value={formData.email_nguoi_dung}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Label htmlFor="email_nguoi_dung">Email</Label>
+                            <Input type="email" id="email_nguoi_dung" name="email_nguoi_dung" value={formData.email_nguoi_dung} onChange={handleChange} required />
                         </div>
                         <div>
-                            <Label htmlFor="sdt" className='pl-1 mb-2'>sdt</Label>
-                            <Input
-                                type="text"
-                                id="sdt"
-                                name="sdt"
-                                value={formData.sdt}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Label htmlFor="sdt">SĐT</Label>
+                            <Input type="text" id="sdt" name="sdt" value={formData.sdt} onChange={handleChange} required />
                         </div>
                         <div>
-                            <Label htmlFor="mk1" className='pl-1 mb-2'>Mật Khẩu</Label>
-                            <Input
-                                type="password"
-                                id="mk1"
-                                name="mk1"
-                                value={formData.mk1}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Label htmlFor="mk1">Mật Khẩu</Label>
+                            <Input type="password" id="mk1" name="mk1" value={formData.mk1} onChange={handleChange} required />
                         </div>
                         <div>
-                            <Label htmlFor="mk2" className='pl-1 mb-2'>Nhập lại Mật Khẩu</Label>
-                            <Input
-                                type="password"
-                                id="mk2"
-                                name="mk2"
-                                value={formData.mk2}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Label htmlFor="mk2">Nhập lại Mật Khẩu</Label>
+                            <Input type="password" id="mk2" name="mk2" value={formData.mk2} onChange={handleChange} required />
                         </div>
-                        cái ký tự bị dánh mờ rồi người dùng nhập lại để xác thực 
+                        <div>
+                            <Label htmlFor="captcha">Captcha</Label>
+                            <div className="flex items-center space-x-2">
+                                <Input type="text" id="captcha" name="captcha" value={formData.captcha} onChange={handleChange} placeholder="Nhập mã captcha" required />
+                                <span className="bg-gray-200 px-4 py-2 rounded text-black font-mono">{formData.generatedCaptcha}</span>
+                                <Button type="button" onClick={() => setFormData((prev) => ({ ...prev, generatedCaptcha: generateCaptcha() }))}>
+                                    Tạo lại
+                                </Button>
+                            </div>
+                        </div>
                         <Button type="submit" className="w-full mt-4" disabled={loading}>
                             {loading ? "Đang đăng ký..." : "Đăng Ký"}
                         </Button>
