@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { handleOrderSubmit } from "./dathang/dathang.action";
+import { handleOrderSubmit } from "./dathang.action";
+
 
 
 export default function OrderForm() {
