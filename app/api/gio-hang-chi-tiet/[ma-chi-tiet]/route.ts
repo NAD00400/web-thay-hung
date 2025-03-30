@@ -1,7 +1,6 @@
+import { prisma } from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 // GET: Retrieve records with optional query parameters
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);

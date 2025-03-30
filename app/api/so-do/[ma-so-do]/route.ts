@@ -1,7 +1,7 @@
-import { PrismaClient } from "@prisma/client/extension";
+
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 // GET API
 export async function GET(request: NextRequest) {
@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const soDo = await prisma.soDo.findUnique({
-            where: { id: maSoDo },
+        const soDo = await prisma.soDoDatMay.findUnique({
+            where: { ma_so_do: maSoDo },
         });
 
         if (!soDo) {
@@ -38,8 +38,8 @@ export async function PUT(request: NextRequest) {
 
     try {
         const data = await request.json();
-        const updatedSoDo = await prisma.soDo.update({
-            where: { id: maSoDo },
+        const updatedSoDo = await prisma.soDoDatMay.update({
+            where: { ma_so_do: maSoDo },
             data,
         });
 
@@ -59,8 +59,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     try {
-        await prisma.soDo.delete({
-            where: { id: maSoDo },
+        await prisma.soDoDatMay.delete({
+            where: { ma_so_do: maSoDo },
         });
 
         return NextResponse.json({ message: 'Record deleted successfully' });

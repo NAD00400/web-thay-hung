@@ -1,7 +1,6 @@
+import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 
 // PUT API handler
 // export async function PUT(req: NextRequest, { params }: { params: { 'ma-gio-hang': string } }) {

@@ -1,5 +1,6 @@
-import SanPhamList from '@/app/components/sanpham.list';
+import SanPhamList from '@/app/components/sanpham/sanpham.list';
 import { fetchSanPham } from '@/app/lib/fetchData';
+
 
 
 export default async function SanPhamPage() {

@@ -1,9 +1,5 @@
+import { prisma } from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-// viết cho tôi api get post bằng next js ts 13+ và dùng prisma
-
-
-const prisma = new PrismaClient();
 
 // GET API: Fetch all customers
 export async function GET() {

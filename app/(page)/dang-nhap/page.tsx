@@ -1,4 +1,4 @@
-import LoginForm from "@/app/components/dangnhap.lgForm";
+import LoginForm from "@/app/components/dangnhap/dangnhap.lgForm";
 
 
 export default function LoginPage() {

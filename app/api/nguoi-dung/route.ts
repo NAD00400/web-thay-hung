@@ -1,7 +1,6 @@
+import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     const { ten_nguoi_dung, email_nguoi_dung, link_anh_dai_dien, firebaseId, vai_tro } = await req.json();

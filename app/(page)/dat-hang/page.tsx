@@ -1,4 +1,5 @@
-import OrderForm from "@/app/components/dathang.form";
+import OrderForm from "@/app/components/dathang/dathang.form";
+
 
 export default function DatHangPage() {
     const products = [

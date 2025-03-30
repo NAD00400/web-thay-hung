@@ -1,7 +1,6 @@
+import { prisma } from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-//// viết thêm cho tôi api get ,put và delete bằng next js ts 13+ và dùng prisma và searchParams
-const prisma = new PrismaClient();
+
 
 // GET API: Fetch a customer by ID using searchParams
 export async function GET(req: Request) {

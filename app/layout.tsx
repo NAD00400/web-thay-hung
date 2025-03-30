@@ -1,10 +1,9 @@
 "use client";
+import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import HeaderComponent from "./components/menu";
-import FooterComponent from "./components/footer";
-
-
+import HeaderComponent from "./components/menu/menu.user";
+import FooterComponent from "./components/footer.user";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,19 +17,18 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  
-  
+}) {
+  const pathname = usePathname(); // Lấy đường dẫn hiện tại
+  const isAdminRoute = pathname.startsWith("/admin"); // Kiểm tra nếu đang ở /admin
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <HeaderComponent/>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {!isAdminRoute && <HeaderComponent />}
         {children}
-        <FooterComponent/>
+        {!isAdminRoute && <FooterComponent />}
       </body>
     </html>
   );

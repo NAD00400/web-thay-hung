@@ -1,5 +1,5 @@
 
-import CartActions from "@/app/components/giohang.action";
+import CartActions from "@/app/components/giohang/giohang.action";
 import { getCartItems } from "@/app/lib/seed";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
