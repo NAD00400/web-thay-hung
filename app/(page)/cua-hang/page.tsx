@@ -1,5 +1,5 @@
 import ContactSection from "@/app/components/cuahang.contact";
-import StorySection from "@/app/components/cuahang.storys";
+import StorySection from "@/app/components/cuahang.story";
 
 
 export default function LienHePage() {
