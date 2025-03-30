@@ -1,11 +1,10 @@
 import { prisma } from '@/app/lib/prisma';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 
 // GET API: Fetch a customer by ID using searchParams
-export async function GET(req: Request) {
-    const url = new URL(req.url);
-    const maKhachHang = url.searchParams.get('ma-khach-hang');
+export async function GET(req: NextRequest, { params }: { params: { 'ma-khach-hang': string } }) {
+    const { 'ma-khach-hang': maKhachHang } = params;
 
     if (!maKhachHang) {
         return NextResponse.json({ error: 'Missing ma-khach-hang parameter' }, { status: 400 });
@@ -26,9 +25,8 @@ export async function GET(req: Request) {
     }
 }
 // PUT API: Update a customer by ID using searchParams
-export async function PUT(req: Request) {
-    const url = new URL(req.url);
-    const maKhachHang = url.searchParams.get('ma-khach-hang');
+export async function PUT(req: NextRequest, { params }: { params: { 'ma-khach-hang': string } }) {
+    const { 'ma-khach-hang': maKhachHang } = params;
 
     if (!maKhachHang) {
         return NextResponse.json({ error: 'Missing ma-khach-hang parameter' }, { status: 400 });
@@ -51,9 +49,8 @@ export async function PUT(req: Request) {
 }
 
 // DELETE API: Delete a customer by ID using searchParams
-export async function DELETE(req: Request) {
-    const url = new URL(req.url);
-    const maKhachHang = url.searchParams.get('ma-khach-hang');
+export async function DELETE(req: NextRequest, { params }: { params: { 'ma-khach-hang': string } }) {
+    const { 'ma-khach-hang': maKhachHang } = params;
 
     if (!maKhachHang) {
         return NextResponse.json({ error: 'Missing ma-khach-hang parameter' }, { status: 400 });

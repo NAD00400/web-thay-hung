@@ -1,9 +1,8 @@
 import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 // GET API Route
-export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const maDonHang = searchParams.get('ma-don-hang');
+export async function GET(req: NextRequest, { params }: { params: { "ma-don-hang": string } }) {
+    const { "ma-don-hang": maDonHang} = params; 
 
     if (!maDonHang) {
         return NextResponse.json({ error: 'Missing ma-don-hang parameter' }, { status: 400 });
@@ -20,9 +19,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(order, { status: 200 });
 }
 // DELETE API Route
-export async function DELETE(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const maDonHang = searchParams.get('ma-don-hang');
+export async function DELETE(req: NextRequest, { params }: { params: { "ma-don-hang": string } }) {
+    const { "ma-don-hang": maDonHang} = params; 
     await prisma.danhMuc.delete({
                 where: { ma_danh_muc: maDonHang as string },
             });
@@ -30,9 +28,8 @@ export async function DELETE(req: NextRequest) {
 }
 
 // PUT API Route
-export async function PUT(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const maDonHang = searchParams.get('ma-don-hang');
+export async function PUT(req: NextRequest, { params }: { params: { "ma-don-hang": string } }) {
+    const { "ma-don-hang": maDonHang} = params; 
     const body = await req.json();
 
     // Logic to update the order by maDonHang with the data in body

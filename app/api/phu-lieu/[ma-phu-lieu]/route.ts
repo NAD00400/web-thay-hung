@@ -19,15 +19,14 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to update phu lieu' }, { status: 500 });
     }
 }
-export async function DELETE(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-    if (!id) {
+export async function DELETE(req: NextRequest, { params }: { params: { 'ma-phu-lieu': string } }) {
+    const { 'ma-phu-lieu': maPhuLieu } = params;
+    if (!maPhuLieu) {
         return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
     try {
         await prisma.phuLieuMayMac.delete({
-            where: { ma_phu_lieu: id },
+            where: { ma_phu_lieu: maPhuLieu },
         });
         return NextResponse.json(null, { status: 204 });
     } catch (error) {

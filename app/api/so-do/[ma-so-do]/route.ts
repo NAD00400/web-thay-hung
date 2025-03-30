@@ -1,15 +1,12 @@
-
 import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-
-// GET API
-export async function GET(request: NextRequest) {
-    const url = new URL(request.url);
-    const maSoDo = url.searchParams.get('ma-so-do');
+// GET API - Lấy thông tin sơ đồ đặt may theo mã số
+export async function GET(req: NextRequest, { params }: { params: { "ma-so-do": string } }) {
+    const { "ma-so-do": maSoDo } = params;
 
     if (!maSoDo) {
-        return NextResponse.json({ error: 'Missing ma-so-do parameter' }, { status: 400 });
+        return NextResponse.json({ error: "Missing ma-so-do parameter" }, { status: 400 });
     }
 
     try {
@@ -18,44 +15,44 @@ export async function GET(request: NextRequest) {
         });
 
         if (!soDo) {
-            return NextResponse.json({ error: 'Record not found' }, { status: 404 });
+            return NextResponse.json({ error: "Record not found" }, { status: 404 });
         }
 
-        return NextResponse.json(soDo);
+        return NextResponse.json(soDo, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch record' }, { status: 500 });
+        console.error("GET Error:", error);
+        return NextResponse.json({ error: "Failed to fetch record" }, { status: 500 });
     }
 }
 
-// PUT API
-export async function PUT(request: NextRequest) {
-    const url = new URL(request.url);
-    const maSoDo = url.searchParams.get('ma-so-do');
+// PUT API - Cập nhật thông tin sơ đồ đặt may
+export async function PUT(req: NextRequest, { params }: { params: { "ma-so-do": string } }) {
+    const { "ma-so-do": maSoDo } = params;
 
     if (!maSoDo) {
-        return NextResponse.json({ error: 'Missing ma-so-do parameter' }, { status: 400 });
+        return NextResponse.json({ error: "Missing ma-so-do parameter" }, { status: 400 });
     }
 
     try {
-        const data = await request.json();
+        const data = await req.json(); // Sửa lỗi sai request.json()
         const updatedSoDo = await prisma.soDoDatMay.update({
             where: { ma_so_do: maSoDo },
             data,
         });
 
-        return NextResponse.json(updatedSoDo);
+        return NextResponse.json(updatedSoDo, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to update record' }, { status: 500 });
+        console.error("PUT Error:", error);
+        return NextResponse.json({ error: "Failed to update record" }, { status: 500 });
     }
 }
 
-// DELETE API
-export async function DELETE(request: NextRequest) {
-    const url = new URL(request.url);
-    const maSoDo = url.searchParams.get('ma-so-do');
+// DELETE API - Xóa sơ đồ đặt may theo mã số
+export async function DELETE(req: NextRequest, { params }: { params: { "ma-so-do": string } }) {
+    const { "ma-so-do": maSoDo } = params;
 
     if (!maSoDo) {
-        return NextResponse.json({ error: 'Missing ma-so-do parameter' }, { status: 400 });
+        return NextResponse.json({ error: "Missing ma-so-do parameter" }, { status: 400 });
     }
 
     try {
@@ -63,8 +60,9 @@ export async function DELETE(request: NextRequest) {
             where: { ma_so_do: maSoDo },
         });
 
-        return NextResponse.json({ message: 'Record deleted successfully' });
+        return NextResponse.json({ message: "Record deleted successfully" }, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to delete record' }, { status: 500 });
+        console.error("DELETE Error:", error);
+        return NextResponse.json({ error: "Failed to delete record" }, { status: 500 });
     }
 }

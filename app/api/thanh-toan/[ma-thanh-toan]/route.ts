@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest, { params }: { params: { 'ma-thanh-toan': string } }) {
     const { searchParams } = new URL(req.url);
     const filter = searchParams.get('filter') || undefined;
+    
 
     try {
         const payment = await prisma.thanhToan.findMany({

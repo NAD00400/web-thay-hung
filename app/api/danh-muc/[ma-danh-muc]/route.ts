@@ -1,10 +1,9 @@
 import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 // viết thêm cho tôi api get bằng next js ts 13+ và dùng prisma và searchParams
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, { params }: { params: { "ma-danh-muc": string } }) {
     try {
-        const { searchParams } = new URL(req.url);
-        const id = searchParams.get('ma-danh-muc');
+        const { "ma-danh-muc": id } = params; // Lấy ID từ params
 
         if (id) {
             const category = await prisma.danhMuc.findUnique({
@@ -24,10 +23,9 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
     }
 }
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest, { params }: { params: { "ma-danh-muc": string } }) {
     try {
-        const { searchParams } = new URL(req.url);
-        const id = searchParams.get('ma-danh-muc');
+         const { "ma-danh-muc": id } = params;
         await prisma.danhMuc.delete({
             where: { ma_danh_muc: id as string },
         });
@@ -37,10 +35,9 @@ export async function DELETE(req: NextRequest) {
     }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest, { params }: { params: { "ma-danh-muc": string } }) {
     try {
-        const { searchParams } = new URL(req.url);
-        const id = searchParams.get('ma-danh-muc');
+        const { "ma-danh-muc": id } = params;
         const { ten_danh_muc, url_image } = await req.json();
         const danh_muc_slug = generateSlug(ten_danh_muc);
         const updatedCategory = await prisma.danhMuc.update({

@@ -2,9 +2,8 @@ import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET API
-export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const maGiaoHang = searchParams.get('ma-giao-hang');
+export async function GET(req: NextRequest, { params }: { params: { "ma_giao_hang": string } }) {
+    const { "ma_giao_hang": maGiaoHang} = params; 
     try {
         if (maGiaoHang) {
             const giaoHang = await prisma.giaoHang.findUnique({
@@ -25,10 +24,9 @@ export async function GET(req: NextRequest) {
     }
 }
 // DELETE API
-export async function DELETE(req: NextRequest, ) {
+export async function DELETE(req: NextRequest, { params }: { params: { "ma_giao_hang": string } }, ) {
     
-    const { searchParams } = new URL(req.url);
-    const maGiaoHang = searchParams.get('ma-giao-hang');
+    const { "ma_giao_hang": maGiaoHang} = params; 
     try {
         const deletedRecord = await prisma.giaoHang.delete({
             where: {
@@ -43,9 +41,8 @@ export async function DELETE(req: NextRequest, ) {
 }
 
 // PUT API
-export async function PUT(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const maGiaoHang = searchParams.get('ma-giao-hang');
+export async function PUT(req: NextRequest, { params }: { params: { "ma_giao_hang": string } }) {
+    const { "ma_giao_hang": maGiaoHang} = params; 
     const {dia_chi_giao_hang,ngay_giao_du_kien,ngay_giao_thuc_te,phi_van_chuyen,trang_thai} = await req.json();
     try {
         const updatedGH = await prisma.giaoHang.update({

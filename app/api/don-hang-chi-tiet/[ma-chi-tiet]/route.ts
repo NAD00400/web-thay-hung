@@ -2,9 +2,8 @@ import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET API
-export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const maChiTiet = searchParams.get('ma-chi-tiet');
+export async function GET(req: NextRequest, { params }: { params: { "ma-chi-tiet": string } }) {
+    const { "ma-chi-tiet": maChiTiet} = params; 
     try {
         const record = await prisma.chiTietDonHang.findUnique({
             where: {
@@ -22,10 +21,9 @@ export async function GET(req: NextRequest) {
     }
 }
 // DELETE API
-export async function DELETE(req: NextRequest, ) {
+export async function DELETE(req: NextRequest, { params }: { params: { "ma-chi-tiet": string } }, ) {
     
-    const { searchParams } = new URL(req.url);
-    const maChiTiet = searchParams.get('ma-chi-tiet');
+    const { "ma-chi-tiet": maChiTiet} = params; 
     try {
         const deletedRecord = await prisma.chiTietDonHang.delete({
             where: {
@@ -40,9 +38,8 @@ export async function DELETE(req: NextRequest, ) {
 }
 
 // PUT API
-export async function PUT(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const maChiTiet = searchParams.get('ma-chi-tiet');
+export async function PUT(req: NextRequest, { params }: { params: { "ma-chi-tiet": string } }) {
+    const { "ma-chi-tiet": maChiTiet} = params; 
     const body = await req.json();
     try {
         const updatedRecord = await prisma.chiTietDonHang.update({
