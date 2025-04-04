@@ -9,7 +9,7 @@ async function main() {
       email_nguoi_dung: "user222222@example.com",
       ten_nguoi_dung: "Nguyen Van A",
       vai_tro: "KHACH_HANG",
-      link_anh_dai_dien: "https://example.com/avatar.jpg",
+      link_anh_dai_dien: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070068726-DALL%C2%B7E%202025-03-03%2012.53.06%20-%20A%20contemporary%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20wear%2C%20featuring%20a%20dark%20green%20fabric%20with%20subtle%20floral%20embroidery%20on%20the%20chest.%20The%20design%20is%20sleek%20with%20a-hVcSOlrM1vfLrpOD00dyn3ybZUIQAZ.webp",
       firebaseId: "firebase124422",
     },
   });
@@ -17,6 +17,7 @@ async function main() {
   // 🌱 Tạo khách hàng dựa trên user
   const customer = await prisma.khachHang.create({
     data: {
+      ten_khach_hang: "Lê Thị Tuyết",
       ma_nguoi_dung: user.ma_nguoi_dung,
       so_dien_thoai: "0123456789",
       dia_chi_khach_hang: "123 Đường ABC, TP.HCM",
@@ -28,7 +29,7 @@ async function main() {
     data: {
       ten_danh_muc: "Áo Dài",
       danh_muc_slug: "ao-dai",
-      url_image: "https://example.com/ao-dai.jpg",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070032523-DALL%C2%B7E%202025-03-03%2012.55.11%20-%20A%20polished%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20wear%2C%20crafted%20in%20a%20deep%20navy%20blue%20with%20subtle%20silver%20embroidery%20along%20the%20neckline.%20The%20design%20is%20sleek%20and%20pr-djvT7wOIhWq8iwRYCHFZhowBv2Hfem.webp",
     },
   });
 
@@ -99,6 +100,7 @@ async function main() {
   // 🌱 Tạo lịch hẹn khách hàng
   await prisma.lichHenKhachHang.create({
     data: {
+    
       ma_khach_hang: customer.ma_khach_hang,
       ngay_hen: new Date(),
       ngay_tao: new Date(),
@@ -148,7 +150,20 @@ async function main() {
       vong_ong_quan: "25",
     },
   });
-
+  await prisma.phuLieuMayMac.create({
+    data: {
+      vai_chinh: "Cotton 100%",
+      chi: "Chỉ may polyester",
+      nut: "Nút gỗ tròn",
+      day_keo: "Dây kéo nhựa",
+      ren: "Ren thêu họa tiết",
+      vai_lot: "Lụa mềm cao cấp",
+      hat_cuom: "Hạt cườm ngọc trai",
+      mech_dung: "Mếch vải cứng",
+      ngay_tao: new Date(),
+      ngay_cap_nhat: new Date(),
+    },
+  });
   console.log("Seeding completed!");
 }
 
@@ -171,6 +186,7 @@ main()
 // npx tsx prisma/seed.ts  để chạy file seed.ts
 // npx prisma migrate dev --name <migration_name> để tạo migration mới
 // npx prisma generate để cập nhật Prisma Client
+// npm install @prisma/client cài lại gói @prisma/client
 // npx prisma studio để mở Prisma Studio
 // npx prisma migrate reset để xóa tất cả migration và reset cơ sở dữ liệu
 // npx prisma migrate deploy để deploy migration lên cơ sở dữ liệu

@@ -2,23 +2,23 @@ import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET API
-export async function GET(req: NextRequest, { params }: { params: { 'ma-lich-hen': string } }) {
-    const { searchParams } = new URL(req.url);
-    const filter = searchParams.get('filter') || undefined;
+// export async function GET(req: NextRequest, { params }: { params: { 'ma-lich-hen': string } }) {
+//     const { searchParams } = new URL(req.url);
+//     const filter = searchParams.get('filter') || undefined;
 
-    try {
-        const maLichHen = params['ma-lich-hen'];
-        const result = await prisma.lichHenKhachHang.findMany({
-            where: {
-                ma_lich_hen: maLichHen,
-                ...(filter && { someField: { contains: filter } }), // Adjust `someField` as needed
-            },
-        });
-        return NextResponse.json(result);
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
-    }
-}
+//     try {
+//         const maLichHen = params['ma-lich-hen'];
+//         const result = await prisma.lichHenKhachHang.findMany({
+//             where: {
+//                 ma_lich_hen: maLichHen,
+//                 ...(filter && { someField: { contains: filter } }), // Adjust `someField` as needed
+//             },
+//         });
+//         return NextResponse.json(result);
+//     } catch (error) {
+//         return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
+//     }
+// }
 
 // PUT API
 export async function PUT(req: NextRequest, { params }: { params: { 'ma-lich-hen': string } }) {
@@ -37,15 +37,17 @@ export async function PUT(req: NextRequest, { params }: { params: { 'ma-lich-hen
 }
 
 // DELETE API
-export async function DELETE(req: NextRequest, { params }: { params: { 'ma-lich-hen': string } }) {
-    const maLichHen = params['ma-lich-hen'];
-
+export async function DELETE(req: NextRequest, { params }: { params: { ma_lich_hen: string } }) {
+    const { ma_lich_hen } = params;
+  
     try {
-        await prisma.lichHenKhachHang.delete({
-            where: { ma_lich_hen: maLichHen },
-        });
-        return NextResponse.json({ message: 'Record deleted successfully' });
+      await prisma.lichHenKhachHang.delete({
+        where: { ma_lich_hen },
+      });
+  
+      return NextResponse.json({ message: 'Record deleted successfully' });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to delete data' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to delete data' }, { status: 500 });
     }
-}
+  }
+  

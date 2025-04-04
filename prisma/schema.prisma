@@ -82,11 +82,11 @@ model DonHang {
   ghi_chu                String?
   ngay_cap_nhat          DateTime            @default(now())
 
-  // Quan hệ: Một đơn hàng thuộc về 1 khách hàng
+ 
   khach_hang        KhachHang        @relation(fields: [ma_khach_hang], references: [ma_khach_hang])
-  // Quan hệ 1-n: Một đơn hàng có nhiều chi tiết đơn hàng
+ 
   chi_tiet_don_hang ChiTietDonHang[]
-  // Quan hệ 1-1: Mỗi đơn hàng có duy nhất một hóa đơn, giao hàng, thanh toán
+
   hoa_don           HoaDon?
   giao_hang         GiaoHang?
   thanh_toan        ThanhToan?
@@ -131,11 +131,11 @@ model HoaDon {
 
 model KhachHang {
   ma_khach_hang      String @id @default(uuid())
-  ma_nguoi_dung      String @unique
+  ten_khach_hang     String @default("Unknown")
+  ma_nguoi_dung      String? @unique
   so_dien_thoai      String
   dia_chi_khach_hang String
-
-  nguoi_dung NguoiDung          @relation(fields: [ma_nguoi_dung], references: [ma_nguoi_dung])
+  nguoi_dung NguoiDung?          @relation(fields: [ma_nguoi_dung], references: [ma_nguoi_dung])
   don_hang   DonHang[]
   lich_hen   LichHenKhachHang[]
   GioHang    GioHang[]

@@ -1,15 +1,17 @@
 'use client'
-import React, { useState } from "react";
+import { cn } from "@/lib/utils";
+import { MessageSquareText,LayoutDashboardIcon, ListOrderedIcon, LogOutIcon, MenuIcon, Package2Icon, User2Icon, Calendar1Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { LayoutDashboardIcon, ListOrderedIcon, User2Icon, Package2Icon, MenuIcon, LogOutIcon } from "lucide-react";
+import { useState } from "react";
 
 const menuItems = [
-  { name: "Đánh giá", href: "/admin/danh-giagia", icon: LayoutDashboardIcon },
+  { name: "Bảng Điều Khiển", href: "/admin", icon: LayoutDashboardIcon },
   { name: "Đơn Hàng", href: "/admin/don-hang", icon: ListOrderedIcon },
+  { name: "Lịch Hẹn", href: "/admin/lich-hen", icon: Calendar1Icon },
   { name: "Khách Hàng", href: "/admin/khach-hang", icon: User2Icon },
   { name: "Sản Phẩm", href: "/admin/san-pham", icon: Package2Icon },
+  { name: "Giao Hàng", href: "/admin/giao-hàng", icon: MessageSquareText },
 ];
 
 const AdminMenu = () => {
@@ -18,11 +20,11 @@ const AdminMenu = () => {
 
   return (
     <aside className={cn(
-      "h-screen transition-all duration-300 backdrop-blur-lg bg-white/10 border border-white/20 flex flex-col",
+      "h-full transition-all duration-300 backdrop-blur-lg bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-white/20 flex flex-col",
       isOpen ? "w-64" : "w-20"
     )}>
       {/* Toggle Sidebar */}
-      <div className="p-4 pl-6 flex items-center justify-between">
+      <div className="p-6  flex items-center justify-between">
         <span className={cn("text-white text-lg font-bold", !isOpen && "hidden")}>
           Admin Panel
         </span>

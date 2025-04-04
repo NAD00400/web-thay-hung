@@ -48,9 +48,8 @@ export async function PUT(req: NextRequest, { params }: { params: { 'ma-khach-ha
     }
 }
 
-// DELETE API: Delete a customer by ID using searchParams
 export async function DELETE(req: NextRequest, { params }: { params: { 'ma-khach-hang': string } }) {
-    const { 'ma-khach-hang': maKhachHang } = params;
+    const { 'ma-khach-hang': maKhachHang } = await params; // await params
 
     if (!maKhachHang) {
         return NextResponse.json({ error: 'Missing ma-khach-hang parameter' }, { status: 400 });
@@ -69,3 +68,4 @@ export async function DELETE(req: NextRequest, { params }: { params: { 'ma-khach
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
