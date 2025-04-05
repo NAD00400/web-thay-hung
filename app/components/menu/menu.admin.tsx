@@ -6,12 +6,12 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const menuItems = [
-  { name: "Bảng Điều Khiển", href: "/admin", icon: LayoutDashboardIcon },
-  { name: "Đơn Hàng", href: "/admin/don-hang", icon: ListOrderedIcon },
+  // { name: "Bảng Điều Khiển", href: "/admin", icon: LayoutDashboardIcon },
   { name: "Lịch Hẹn", href: "/admin/lich-hen", icon: Calendar1Icon },
+  { name: "Đơn Hàng", href: "/admin/don-hang", icon: ListOrderedIcon },
   { name: "Khách Hàng", href: "/admin/khach-hang", icon: User2Icon },
   { name: "Sản Phẩm", href: "/admin/san-pham", icon: Package2Icon },
-  { name: "Giao Hàng", href: "/admin/giao-hàng", icon: MessageSquareText },
+  { name: "Giao Hàng", href: "/admin/giao-hang", icon: MessageSquareText },
 ];
 
 const AdminMenu = () => {

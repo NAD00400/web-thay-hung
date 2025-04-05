@@ -1,8 +1,6 @@
-// Define TypeScript interfaces for the application
-// This file contains the definitions for various entities used in the application
-// including SanPham, DanhMuc, PhuLieu, and SanPhamDatMay.
-// Each interface defines the structure of the object, including its properties and types.
-// The interfaces are used to ensure type safety and provide better code completion in TypeScript.
+
+import { User } from "firebase/auth";
+
 // Define the structure of a SanPham object
 interface SanPhamDatMay {
     maSanPhamDatMay: string;
@@ -90,4 +88,8 @@ interface ILichHen {
   ngay_tao: string;
   trang: string;
   khach_hang: ICustomer;
+}
+ interface UserContextType {
+  user: User | null;
+  setUser?: (user: User | null) => void; // Add setUser to the context type
 }

@@ -3,7 +3,8 @@ import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderComponent from "./components/menu/menu.user";
-import FooterComponent from "./components/footer.user";
+import FooterComponent from "./components/footer/footer.user";
+import { UserProvider } from "./lib/context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <UserProvider>
         {!isAdminRoute && <HeaderComponent />}
         {children}
         {!isAdminRoute && <FooterComponent />}
+      </UserProvider>
       </body>
     </html>
   );

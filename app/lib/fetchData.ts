@@ -1,6 +1,6 @@
 // /c:/Thư mục mới/my production/học tập - NestJs/nhom-13/app/lib/fetchingData.ts
 
-import { transformSanPham } from "./util";
+
 
 export async function fetchSanPham() {
     try {
@@ -15,9 +15,8 @@ export async function fetchSanPham() {
         if (!response.ok) {
             throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
         }
-
         const data = await response.json();
-        return data.map(transformSanPham); // tên dữ liệu trong interface khac voi trong db nên phải viết thêm hàng để đổi tên trường dữ  liệu viết ở trong lib/utilutil
+        return data
     } catch (error) {
         console.error('Error fetching products:', error);
         throw error;
@@ -38,7 +37,7 @@ export async function fetchSanPhamChiTiet(id:string) {
         }
 
         const data = await response.json();
-        return data.map(transformSanPham); // tên dữ liệu trong interface khac voi trong db nên phải viết thêm hàng để đổi tên trường dữ  liệu viết ở trong lib/utilutil
+        return data 
     } catch (error) {
         console.error('Error fetching products:', error);
         throw error;
