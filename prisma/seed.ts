@@ -74,7 +74,7 @@ async function main() {
       ten_san_pham: "Áo Dài Công Sở Thiết Đan",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070068726-DALL%C2%B7E%202025-03-03%2012.53.06%20-%20A%20contemporary%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20wear%2C%20featuring%20a%20dark%20green%20fabric%20with%20subtle%20floral%20embroidery%20on%20the%20chest.%20The%20design%20is%20sleek%20with%20a-hVcSOlrM1vfLrpOD00dyn3ybZUIQAZ.webp",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070083254-DALL%C2%B7E%202025-03-03%2012.52.47%20-%20A%20stylish%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20professionals%2C%20featuring%20a%20soft%20pastel%20beige%20fabric%20with%20elegant%20button%20details%20along%20the%20collar.%20The%20design%20is-dCGvuyrfJTxC2ZoKMPOHFu6cUJTeeb.webp",
       co_san: false,
     },
   });

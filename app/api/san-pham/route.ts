@@ -3,15 +3,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 
 
-// Handle GET request
 export async function GET() {
     try {
-        const products = await prisma.sanPhamDatMay.findMany();
+        const products = await prisma.sanPhamDatMay.findMany({
+            select: {
+                ma_san_pham_dat_may: true,
+                ten_san_pham: true,
+                mo_ta_san_pham: true,
+                gia_tien: true,
+                url_image: true
+            },
+            orderBy: {
+                ten_san_pham: 'asc'
+            }
+        });        
         return NextResponse.json(products, { status: 200 });
     } catch (error) {
+        console.error('Error fetching products:', error);
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
 }
+
 
 // Handle POST request
 export async function POST(req: NextRequest) {

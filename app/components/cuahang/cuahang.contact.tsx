@@ -6,7 +6,7 @@ const googleMapsUrl =
 
 export default function ContactSection() {
     return (
-        <div className="relative min-h-screen w-full flex flex-col items-center justify-center text-white">
+        <div className="relative min-h-screen w-full flex flex-col items-center justify-center text-white mt-6">
             {/* Background Image */}
             <div className="absolute inset-0">
                 <Image

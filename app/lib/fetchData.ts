@@ -1,154 +1,77 @@
-// /c:/Thư mục mới/my production/học tập - NestJs/nhom-13/app/lib/fetchingData.ts
+// /app/lib/fetchingData.ts
 
-
-
-export async function fetchSanPham() {
+// Hàm dùng chung để gọi API
+async function fetchData(endpoint: string) {
     try {
-        const response = await fetch(`${process.env.BASE_URL}/api/san-pham`, {
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}${endpoint}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // Ensures fresh data is fetched
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store',
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        return data
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-}
-export async function fetchSanPhamChiTiet(id:string) {
-    try {
-        const response = await fetch(`${process.env.BASE_URL}/api/san-pham/${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // Ensures fresh data is fetched
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
+            throw new Error(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
         }
 
-        const data = await response.json();
-        return data 
+        return await response.json();
     } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error:', error);
         throw error;
     }
 }
 
-export async function fetchDonHang() {
-    try {
-        const response = await fetch(`${process.env.BASE_URL}/api/don-hang`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // Ensures fresh data is fetched
-        });
+// ========== API CƠ BẢN ==========
+export const fetchSanPham = () => fetchData('/api/san-pham');
+export const fetchSanPhamChiTiet = (id: string) => fetchData(`/api/san-pham/${id}`);
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
-        }
+export const fetchDonHang = () => fetchData('/api/don-hang');
+export const fetchDonHangChiTiet = (id: string) => fetchData(`/api/don-hang/${id}`);
 
-        const data = await response.json();
-        return data
-        // return data.map(transformSanPham); // tên dữ liệu trong interface khac voi trong db nên phải viết thêm hàng để đổi tên trường dữ  liệu viết ở trong lib/utilutil
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-}
-export async function fetchDonHangChiTiet(id:string) {
-    try {
-        const response = await fetch(`${process.env.BASE_URL}/api/don-hang/${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // Ensures fresh data is fetched
-        });
+export const fetchKhachHang = () => fetchData('/api/khach-hang');
+export const fetchLichHen = () => fetchData('/api/lich-hen');
+export const fetchNguoiDung = () => fetchData('/api/nguoi-dung');
+export const fetchPhuLieu = () => fetchData('/api/phu-lieu');
+export const fetchDanhMuc = () => fetchData('/api/danh-muc');
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        return data
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-}
-export async function fetchKhachHang() {
-    try {
-        const response = await fetch(`${process.env.BASE_URL}/api/khach-hang`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // Ensures fresh data is fetched
-        });
+// ========== API LIÊN KẾT ==========
+export const fetchDonHangChiTietByIdKhachHang = (id: string) =>
+    fetchData(`/api/don-hang/khach-hang/${id}`);
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
-        }
+export const fetchDonHangChiTietByIdSanPham = (id: string) =>
+    fetchData(`/api/don-hang/san-pham/${id}`);
 
-        const data = await response.json();
-        return data
-        // return data.map(transformSanPham); // tên dữ liệu trong interface khac voi trong db nên phải viết thêm hàng để đổi tên trường dữ  liệu viết ở trong lib/utilutil
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-}
-export async function fetchKhachHangChiTiet(id:string) {
-    try {
-        const response = await fetch(`${process.env.BASE_URL}/api/khach-hang/${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // Ensures fresh data is fetched
-        });
+export const fetchDonHangChiTietByIdPhuLieu = (id: string) =>
+    fetchData(`/api/don-hang/phu-lieu/${id}`);
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
-        }
+export const fetchDonHangChiTietByIdLichHen = (id: string) =>
+    fetchData(`/api/don-hang/lich-hen/${id}`);
 
-        const data = await response.json();
-        return data
-        // return data.map(transformSanPham); // tên dữ liệu trong interface khac voi trong db nên phải viết thêm hàng để đổi tên trường dữ  liệu viết ở trong lib/utilutil
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-}
-export async function fetchLichHen() {
-    try {
-        const response = await fetch(`${process.env.BASE_URL}/api/lich-hen`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // Ensures fresh data is fetched
-        });
+export const fetchDonHangChiTietByIdNguoiDung = (id: string) =>
+    fetchData(`/api/don-hang/nguoi-dung/${id}`);
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
-        }
+export const fetchNguoiDungByFirebaseId = (firebaseId: string) =>
+    fetchData(`/api/nguoi-dung/firebase/${firebaseId}`);
 
-        const data = await response.json();
-        return data
-        // return data.map(transformSanPham); // tên dữ liệu trong interface khac voi trong db nên phải viết thêm hàng để đổi tên trường dữ  liệu viết ở trong lib/utilutil
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-}
+export const fetchKhachHangByNguoiDungId = (NguoiDungId: string) =>
+    fetchData(`/api/khach-hang/nguoi-dung/${NguoiDungId}`);
+
+export const fetchGioHangByCustomerId = (cusId: string) =>
+    fetchData(`/api/gio-hang/khach-hang/${cusId}`);
+ 
+// ========== API KẾT HỢP ==========
+export const fetchDonHangChiTietByIdKhachHangAndSanPham = (
+    idKhachHang: string,
+    idSanPham: string
+) => fetchData(`/api/don-hang/khach-hang/${idKhachHang}/san-pham/${idSanPham}`);
+
+export const fetchDonHangChiTietByIdKhachHangAndPhuLieu = (
+    idKhachHang: string,
+    idPhuLieu: string
+) => fetchData(`/api/don-hang/khach-hang/${idKhachHang}/phu-lieu/${idPhuLieu}`);
+
+export const fetchDonHangChiTietByIdKhachHangAndLichHen = (
+    idKhachHang: string,
+    idLichHen: string
+) => fetchData(`/api/don-hang/khach-hang/${idKhachHang}/lich-hen/${idLichHen}`);
+

@@ -1,6 +1,8 @@
 'use client';
 import Image from "next/image";
 import Link from "next/link";
+import StorySection from "./components/cuahang/cuahang.storys";
+import ContactSection from "./components/cuahang/cuahang.contact";
 
 export default function Home() {
   return (
@@ -18,6 +20,8 @@ export default function Home() {
                 </button>
         </div>
       </section>
+      <StorySection />
+      <ContactSection />
     </div>
   </>
   );

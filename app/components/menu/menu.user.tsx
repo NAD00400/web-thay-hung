@@ -20,7 +20,6 @@ const HeaderComponent: React.FC = () => {
   const navLinks = [
     { href: '/', label: 'Trang Chủ' },
     { href: '/san-pham', label: 'Sản Phẩm' },
-    { href: '/cua-hang', label: 'Cửa Hàng' },
   ];
 
   const authLinks = user

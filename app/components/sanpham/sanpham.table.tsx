@@ -1,6 +1,17 @@
 'use client'
 import { useState, useEffect } from "react";
 
+interface SanPhamDatMay {
+  maSanPhamDatMay: string;
+  tenSanPham: string;
+  giaTien: number;
+  moTaSanPham: string;
+  ngayTao: string;
+  ngayCapNhat: string;
+  coSan: boolean;
+  urlImage: string;
+}
+
 export function SanPhamTable({ dataSP }: { dataSP: SanPhamDatMay[] }) {
   const [selectedSanPham, setSelectedSanPham] = useState<SanPhamDatMay | null>(null);
 

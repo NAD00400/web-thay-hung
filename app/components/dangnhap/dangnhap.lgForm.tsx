@@ -19,8 +19,25 @@ export default function LoginForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Email:", email, "Password:", password);
-        // Gửi request API đăng nhập (nếu dùng email/password)
+        try {
+            const res = await fetch("/api/dang-nhap", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (res.ok) {
+                const userData = await res.json();
+                setUser?.(userData); // lưu vào context nếu có
+                router.push("/"); // Chuyển hướng
+            } else {
+                console.error("Đăng nhập thất bại");
+            }
+        } catch (error) {
+            console.error("Lỗi đăng nhập:", error);
+        }
     };
 
     const handleGoogleLogin = async () => {
