@@ -126,7 +126,6 @@ export default function GioHangClient() {
           <p className="text-center text-gray-500 col-span-full">Giỏ hàng trống</p>
         )}
       </div>
-
       <div className="mt-6 p-4 border-t">
         <h2 className="text-xl font-semibold">
           Tổng cộng: {totalPrice.toLocaleString()} VND
