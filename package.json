@@ -33,6 +33,7 @@
     "next": "15.2.4",
     "next-auth": "5.0.0-beta.25",
     "pg": "^8.14.1",
+    "pnpm": "^10.7.1",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-big-calendar": "^1.18.0",
