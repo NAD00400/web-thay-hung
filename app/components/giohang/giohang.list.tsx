@@ -1,13 +1,14 @@
 'use client';
+import CartActions from "@/app/components/giohang/giohang.action.xoa";
 import { useUser } from "@/app/lib/context";
-import { useEffect, useState } from "react";
-import { 
-  fetchGioHangByCustomerId, 
-  fetchKhachHangByNguoiDungId, 
-  fetchNguoiDungByFirebaseId 
+import {
+  fetchGioHangByCustomerId,
+  fetchKhachHangByNguoiDungId,
+  fetchNguoiDungByFirebaseId
 } from "@/app/lib/fetchData";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import CartActions from "@/app/components/giohang/giohang.action";
+import { useEffect, useState } from "react";
+import QuantityAdjuster from "./giohang.action.sua";
 
 // Các kiểu dữ liệu trả về từ API
 interface SanPham {
@@ -90,7 +91,30 @@ export default function GioHangClient() {
   useEffect(() => {
     console.log("Updated cartItems:", cartItems);
   }, [cartItems]);
-
+  async function updateCartQuantity(itemId: string, newQuantity: number) {
+    try {
+      const res = await fetch(`/api/gio-hang-chi-tiet/update-quantity`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ma_chi_tiet_gio_hang: itemId,
+          so_luong: newQuantity,
+        }),
+      });
+  
+      const result = await res.json();
+  
+      if (!res.ok) {
+        console.error("Server error:", result);
+        throw new Error("Failed to update quantity");
+      }
+  
+      console.log("Updated quantity:", result);
+    } catch (error) {
+      console.error("Lỗi cập nhật số lượng:", error);
+    }
+  }  
+  
   if (!user && !loading)
     return <p className="text-center text-red-500">Bạn chưa đăng nhập.</p>;
 
@@ -118,6 +142,15 @@ export default function GioHangClient() {
                 <p>Số lượng: {item.so_luong}</p>
               </CardContent>
               <CardFooter>
+              <QuantityAdjuster
+                itemId={item.ma_chi_tiet_gio_hang}
+                currentQuantity={item.so_luong}
+                onUpdate={(newQuantity) => {
+                  // Gọi API cập nhật số lượng
+                  updateCartQuantity(item.ma_chi_tiet_gio_hang, newQuantity);
+                }}
+              />
+
                 <CartActions itemId={parseInt(item.ma_chi_tiet_gio_hang, 10)} />
               </CardFooter>
             </Card>
