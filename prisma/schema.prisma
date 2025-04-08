@@ -130,6 +130,7 @@ model NguoiDung {
   ma_nguoi_dung     String          @id @default(uuid())
   email_nguoi_dung  String          @unique
   ten_nguoi_dung    String
+  mat_khau          String          @default("")
   vai_tro           VaiTroNguoiDung @default(KHACH_HANG)
   ngay_tao          DateTime        @default(now())
   ngay_cap_nhat     DateTime        @default(now())
