@@ -1,16 +1,21 @@
+import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+
+
 
 // GET API: Fetch a product by its ID with optional searchParams
-export async function GET(req: NextRequest, { params }: { params: { 'ma-san-pham': string } }) {
-    const { 'ma-san-pham': maSanPham } = params;
+export async function GET(req: NextRequest, { params }: { params: { 'id': string } }) {
+    const { 'id': maSanPham } = params;
     const searchParams = req.nextUrl.searchParams;
 
     try {
         const product = await prisma.sanPhamDatMay.findUnique({
             where: { ma_san_pham_dat_may: maSanPham },
+            include: {
+                danh_muc: true,
+                phu_lieu_may_mac: true,
+            },
         });
 
         if (!product) {

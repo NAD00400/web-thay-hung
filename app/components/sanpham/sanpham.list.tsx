@@ -2,15 +2,16 @@
 
 import { useUser } from "@/app/lib/context";
 import { fetchKhachHangByNguoiDungId, fetchNguoiDungByFirebaseId } from "@/app/lib/fetchData";
-import { SanPhamDatMay } from "@prisma/client";
-import { log } from "console";
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaCartArrowDown } from "react-icons/fa";
 
 const itemsPerPage = 8;
 
-const SanPhamList = ({ sanPham }: { sanPham: SanPhamDatMay[] }) => {
+const SanPhamList = ({ sanPham }: { sanPham: any[] }) => {
+    const route =useRouter()
     const { user } = useUser();
     const userId = user?.uid;
     const [userData, setUserData] = useState<any>(null);
@@ -152,10 +153,10 @@ useEffect(() => {
                 >
                   <FaCartArrowDown />
                 </button>
-                <button
+                <button onClick ={()=>route.push(`/san-pham/san-pham-chi-tiet/${product.ma_san_pham_dat_may}`)}
                   className="px-4 py-2 bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors w-full shadow-md hover:shadow-lg"
                 >
-                  Xem Chi Tiết
+                  Xem
                 </button>
               </div>
             </div>
