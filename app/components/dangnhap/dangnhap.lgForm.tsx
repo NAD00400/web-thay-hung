@@ -46,25 +46,9 @@ export default function LoginForm() {
             const result = await signInWithPopup(auth, provider);
             const firebaseUser = result.user;
 
-            // Gửi thông tin đến API để lưu user vào DB
-            const res = await fetch("/api/nguoi-dung", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    ten_nguoi_dung: firebaseUser.displayName,
-                    email_nguoi_dung: firebaseUser.email,
-                    link_anh_dai_dien: firebaseUser.photoURL,
-                    firebaseId: firebaseUser.uid,
-                    vai_tro: "khach_hang",
-                }),
-            });
+            setUser?.(firebaseUser); // hoặc để onAuthStateChanged tự set cũng được
+            router.push("/");
 
-            const userData = await res.json();
-            setUser?.(userData); // lưu vào context nếu có
-
-            router.push("/"); // Chuyển hướng
         } catch (error) {
             console.error("Đăng nhập Google thất bại:", error);
         }
