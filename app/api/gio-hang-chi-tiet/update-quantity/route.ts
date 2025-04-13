@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { ma_chi_tiet_gio_hang, so_luong_moi } = await req.json();
+    const { ma_chi_tiet_gio_hang,so_luong_moi} = await req.json();
 
     if (!ma_chi_tiet_gio_hang || typeof so_luong_moi !== 'number') {
       return NextResponse.json(

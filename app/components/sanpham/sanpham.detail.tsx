@@ -82,12 +82,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <span>{product.danh_muc.ten_danh_muc}</span>
               </div>
 
-              <div className="flex justify-between text-sm pt-2">
+              {/* <div className="flex justify-between text-sm pt-2">
                 <span className="text-gray-500">Tình trạng:</span>
                 <span className={`font-semibold ${product.co_san ? 'text-blue-600' : 'text-red-600'}`}>
                   {product.co_san ? 'Còn hàng' : 'Đã hết'}
                 </span>
-              </div>
+              </div> */}
             </div>
 
             <button

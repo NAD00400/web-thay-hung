@@ -71,6 +71,7 @@ model DonHang {
   giao_hang         GiaoHang?
   thanh_toan        ThanhToan?
 }
+
 model GiaoHang {
   ma_giao_hang      String           @id @default(uuid())
   ma_don_hang       String           @unique
