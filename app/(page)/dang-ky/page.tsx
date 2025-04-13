@@ -10,7 +10,6 @@ export default function DangKyPage() {
     const [formData, setFormData] = useState({
         email_nguoi_dung: "",
         ten_nguoi_dung: "",
-        sdt: "",
         mk1: "",
         mk2: "",
         captcha: "",
@@ -25,7 +24,10 @@ export default function DangKyPage() {
     };
 
     useEffect(() => {
-        setFormData((prev) => ({ ...prev, generatedCaptcha: generateCaptcha() }));
+        setFormData((prev) => ({
+            ...prev,
+            generatedCaptcha: generateCaptcha(),
+        }));
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,16 +35,37 @@ export default function DangKyPage() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const validateInputs = () => {
+        if (formData.mk1 !== formData.mk2) {
+            setError("Mật khẩu nhập lại không khớp.");
+            return false;
+        }
+        if (formData.captcha !== formData.generatedCaptcha) {
+            setError("Mã Captcha không đúng.");
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLoading(true);
         setError("");
 
+        if (!validateInputs()) return;
+
+        setLoading(true);
+
+        const bodyToSend = {
+            email_nguoi_dung: formData.email_nguoi_dung,
+            ten_nguoi_dung: formData.ten_nguoi_dung,
+            mat_khau: formData.mk1,
+        };
+
         try {
-            const response = await fetch("/api/nguoi-dung", {
+            const response = await fetch("/api/nguoi-dung/dang-ky-thu-cong", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(bodyToSend),
             });
 
             const result = await response.json();
@@ -55,7 +78,6 @@ export default function DangKyPage() {
             setFormData({
                 email_nguoi_dung: "",
                 ten_nguoi_dung: "",
-                sdt: "",
                 mk1: "",
                 mk2: "",
                 captcha: "",
@@ -86,10 +108,6 @@ export default function DangKyPage() {
                             <Input type="email" id="email_nguoi_dung" name="email_nguoi_dung" value={formData.email_nguoi_dung} onChange={handleChange} required />
                         </div>
                         <div>
-                            <Label htmlFor="sdt">SĐT</Label>
-                            <Input type="text" id="sdt" name="sdt" value={formData.sdt} onChange={handleChange} required />
-                        </div>
-                        <div>
                             <Label htmlFor="mk1">Mật Khẩu</Label>
                             <Input type="password" id="mk1" name="mk1" value={formData.mk1} onChange={handleChange} required />
                         </div>
@@ -100,8 +118,18 @@ export default function DangKyPage() {
                         <div>
                             <Label htmlFor="captcha">Captcha</Label>
                             <div className="flex items-center space-x-2">
-                                <Input type="text" id="captcha" name="captcha" value={formData.captcha} onChange={handleChange} placeholder="Nhập mã captcha" required />
-                                <span className="bg-gray-200 px-4 py-2 rounded text-black font-mono">{formData.generatedCaptcha}</span>
+                                <Input
+                                    type="text"
+                                    id="captcha"
+                                    name="captcha"
+                                    value={formData.captcha}
+                                    onChange={handleChange}
+                                    placeholder="Nhập mã captcha"
+                                    required
+                                />
+                                <span className="bg-gray-200 px-4 py-2 rounded text-black font-mono">
+                                    {formData.generatedCaptcha}
+                                </span>
                                 <Button type="button" onClick={() => setFormData((prev) => ({ ...prev, generatedCaptcha: generateCaptcha() }))}>
                                     Tạo lại
                                 </Button>

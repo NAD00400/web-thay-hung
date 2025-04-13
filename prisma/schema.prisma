@@ -136,7 +136,7 @@ model NguoiDung {
   ngay_tao          DateTime        @default(now())
   ngay_cap_nhat     DateTime        @default(now())
   link_anh_dai_dien String?
-  firebaseId        String          @unique
+  firebaseId        String?          @unique
 
   khach_hang KhachHang?
 }
