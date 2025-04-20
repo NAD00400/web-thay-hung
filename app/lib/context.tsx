@@ -1,74 +1,60 @@
 "use client";
 
-import {createContext,useContext,useEffect,useState,ReactNode} from "react";
-import {User,
-  onAuthStateChanged,
-  signOut as firebaseSignOut,
-} from "firebase/auth";
-import { auth } from "../lib/firebase";
+import { onAuthStateChanged } from "@firebase/auth";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { auth } from "./firebase";
+import { Loader2 } from "lucide-react";
 
+// Đây là kiểu dữ liệu từ backend, bạn có thể tùy chỉnh
 interface UserContextType {
-  user: User | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
-  setUser: (user: User | null) => void;
+  user: any | null; // nếu bạn có interface riêng cho user backend, hãy thay thế "any"
+  setUser: (user: any | null) => void;
+  signOut: () => void;
+}
+const UserContext = createContext<UserContextType>({
+  user: null,
+  setUser: () => {},
+  signOut: () => {},
+});
+export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const res = await fetch(`/api/khach-hang/firebase/${firebaseUser.uid}`);
+        const data = await res.json();
+        setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
+      } else {
+        setUser(null);
+        localStorage.removeItem("user");
+      }
+      setIsLoading(false);
+    });
+  
+    return () => unsubscribe();
+  }, []);
+  
+  
+
+
+if (isLoading) {
+  return (
+    <div className="fixed inset-0 z-50 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center">
+      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <p className="mt-4 text-sm text-muted-foreground">Đang kiểm tra phiên đăng nhập...</p>
+    </div>
+  );
 }
 
-const UserContext = createContext<UserContextType>({
-    user: null,
-    loading: true,
-    signOut: async () => { },
-    setUser: function (user: User | null): void {
-        throw new Error("Function not implemented.");
-    }
-});
-
-export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [hasSavedToDB, setHasSavedToDB] = useState(false); // tránh gọi API nhiều lần
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      setLoading(false);
-
-      if (user && !hasSavedToDB) {
-        try {
-          // Gọi API backend để lưu thông tin người dùng
-          await fetch("/api/nguoi-dung", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              ma_nguoi_dung: user.uid,
-              email_nguoi_dung: user.email,
-              ten_nguoi_dung: user.displayName,
-              link_anh_dai_dien: user.photoURL,
-              vai_tro: "KHACH_HANG", // Hoặc vai trò khác tùy theo yêu cầu
-              firebaseId: user.uid,
-            }),
-          });
-
-          setHasSavedToDB(true);
-        } catch (error) {
-          console.error("Lỗi khi lưu user vào DB:", error);
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, [hasSavedToDB]);
-
-  const signOut = async () => {
-    await firebaseSignOut(auth);
+  
+  const signOut = () => {
     setUser(null);
-    setHasSavedToDB(false);
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, signOut, setUser }}>
+    <UserContext.Provider value={{ user, setUser, signOut }}>
       {children}
     </UserContext.Provider>
   );

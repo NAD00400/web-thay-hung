@@ -3,15 +3,21 @@ import Image from "next/image";
 import Link from "next/link";
 import StorySection from "./components/cuahang/cuahang.storys";
 import ContactSection from "./components/cuahang/cuahang.contact";
+import SanPhamList from "./components/sanpham/sanpham.list";
+import SanPhamPage from "./(page)/san-pham/page";
+import { useUser } from "./lib/context";
 
 export default function Home() {
+  const {user}= useUser()
+  console.log(user);
+  
   return (
   <>
     <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
       <section 
           className="relative text-white text-center bg-cover bg-center h-screen flex flex-col justify-center items-center"
-          style={{ backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/background/DALL%C2%B7E%202025-03-28%2011.19.20%20-%20A%20traditional%20Ao%20Dai%20clothing%20store%20with%20a%20clean%20white%20theme.%20The%20store%20showcases%20elegant%20Ao%20Dai%20dresses%20on%20mannequins%20and%20neatly%20arranged%20shelves.%20Th-QVEf1RRT5sPkEin6guNdURnjCWP7po.webp')" }}>
+          style={{ backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/background/z6454049196361_946d115cd94d2e5f3f85f84dc551a230-UDCnYr7aN9TvVcWOFxSNH02FPuw4UD.jpg')" }}>
         <div className="sticky top-0 left-0 w-full">
                 
                 <p className="mt-4 text-2xl text-neutral-600 ">We provide the best solutions for your needs.</p>
@@ -21,7 +27,9 @@ export default function Home() {
         </div>
       </section>
       <StorySection />
+      
       <ContactSection />
+      
     </div>
   </>
   );

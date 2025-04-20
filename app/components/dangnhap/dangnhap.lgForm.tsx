@@ -12,11 +12,10 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/app/lib/context";
 
 export default function LoginForm() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const router = useRouter();
-    const { user, setUser } = useUser(); // Ensure setUser exists in the context type
-
+    const [email, setEmail] = useState(""); 
+    const [password, setPassword] = useState(""); 
+    const router = useRouter(); 
+    const { user, setUser } = useUser(); 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -45,15 +44,24 @@ export default function LoginForm() {
         try {
             const result = await signInWithPopup(auth, provider);
             const firebaseUser = result.user;
-
-            setUser?.(firebaseUser); // hoặc để onAuthStateChanged tự set cũng được
-            router.push("/");
-
+            const firebaseID = firebaseUser.uid;
+            const res = await fetch(`/api/khach-hang/firebase/${firebaseID}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            if (res.ok) {
+                const userData = await res.json();
+                setUser?.(userData);
+                router.push("/");
+              } else {
+                console.error("Không tìm thấy thông tin khách hàng từ Firebase ID.");
+              }
         } catch (error) {
             console.error("Đăng nhập Google thất bại:", error);
         }
     };
-
     return (
         <Card className="w-full max-w-md p-8 bg-neutral-50">
             <form onSubmit={handleSubmit}>

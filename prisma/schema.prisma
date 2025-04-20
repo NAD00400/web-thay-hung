@@ -5,23 +5,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-enum TrangThaiDonHang {
-  CHO_XAC_NHAN
-  DANG_XU_LY
-  DANG_VAN_CHUYEN
-  DA_GIAO
-  DA_HUY
-}
-enum PhuongThucThanhToan {
-  ZALOPAY
-  CHUYEN_KHOAN
-  TIEN_MAT
-}
-enum TrangThaiThanhToan {
-  CHUA_THANH_TOAN
-  DA_THANH_TOAN
-  CHO_XAC_NHAN
-}
+
 enum VaiTroNguoiDung {
   KHACH_HANG
   ADMIN
@@ -58,9 +42,9 @@ model DonHang {
   ma_don_hang            String              @id @default(uuid())
   ma_khach_hang          String
   ngay_dat_hang          DateTime            @default(now())
-  trang_thai_don_hang    TrangThaiDonHang
+  trang_thai_don_hang    String
   tong_tien_don_hang     Float
-  phuong_thuc_thanh_toan PhuongThucThanhToan
+  phuong_thuc_thanh_toan String
   thanh_toan_thanh_cong  Boolean
   ghi_chu                String?
   ngay_cap_nhat          DateTime            @default(now())
@@ -75,7 +59,7 @@ model DonHang {
 model GiaoHang {
   ma_giao_hang      String           @id @default(uuid())
   ma_don_hang       String           @unique
-  trang_thai        TrangThaiDonHang
+  trang_thai        String
   phi_van_chuyen    Float
   dia_chi_giao_hang String
   ngay_giao_du_kien DateTime?
@@ -102,7 +86,7 @@ model HoaDon {
   ngay_phat_hanh          DateTime
   ngay_het_han_thanh_toan DateTime
   ngay_cap_nhat           DateTime
-  trang_thanh_toan        TrangThaiThanhToan @default(CHUA_THANH_TOAN)
+  trang_thai_thanh_toan   String
 
   don_hang DonHang @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade, onUpdate: Cascade)
 }
@@ -197,8 +181,8 @@ model SoDoDatMay {
 model ThanhToan {
   ma_thanh_toan String              @id @default(uuid())
   ma_don_hang   String              @unique
-  paymentMethod PhuongThucThanhToan
-  paymentStatus TrangThaiThanhToan
+  paymentMethod String
+  paymentStatus String
   transactionId String              @unique
   createdAt     DateTime            @default(now())
   paymentDate   DateTime            @default(now())
