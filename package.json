@@ -22,6 +22,7 @@
     "@shadcn/ui": "^0.0.4",
     "@splinetool/react-spline": "^4.0.0",
     "@types/react-big-calendar": "^1.16.1",
+    "@vercel/blob": "^1.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

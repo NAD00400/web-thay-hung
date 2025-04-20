@@ -104,6 +104,7 @@ useEffect(() => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <select
+          aria-label="Lọc sản phẩm"
           className="border border-neutral-300 bg-neutral-50 rounded-lg px-4 py-2 ml-4 focus:outline-none focus:ring-2 focus:ring-neutral-500"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -149,6 +150,7 @@ useEffect(() => {
                   onClick={() =>
                     addToCart(product.ma_san_pham_dat_may, customerData?.ma_khach_hang|| '')
                   }
+                  title="Thêm vào giỏ hàng"
                 >
                   <FaCartArrowDown />
                 </button>
