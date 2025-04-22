@@ -38,7 +38,7 @@ const HeaderComponent: React.FC = () => {
       <li key={href}>
         <Link
           href={href}
-          className={`text-gray-700 hover:text-neutral-900 ${isActive(href) ? 'text-neutral-900 font-bold' : ''}`}
+          className={`text-gray-50 hover:text-white ${isActive(href) ? 'text-white font-bold' : ''}`}
           onClick={onClick}
         >
           {label}
@@ -51,12 +51,17 @@ const HeaderComponent: React.FC = () => {
   return (
     <>
       
-      <header className="bg-white shadow-sm py-4 opacity-70 fixed top-0 left-0 w-full backdrop-blur-md z-50 transition-all duration-300">
+      <header className="py-4 opacity-70 fixed top-0 left-0 w-full backdrop-blur-md z-50 transition-all duration-300" 
+      style={{
+        backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/background/ChatGPT%20Image%2018_52_55%2020%20thg%204%2C%202025-7Vo8MBW1HHSxLyxsE7eQAsnxIoSwJC.png')",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+      }}>
         <div className="container mx-auto flex justify-between items-center px-4">
-          <h1 className="text-xl font-bold text-gray-800">Nhà May Thiên Kim</h1>
+          <h1 className="text-xl font-bold text-white">Nhà May Thiên Kim</h1>
           <div className="flex items-center space-x-8">
             <nav>
-              <ul className="flex space-x-6">{renderLinks(navLinks)}</ul>
+              <ul className="flex space-x-6 ">{renderLinks(navLinks)}</ul>
             </nav>
             <nav>
               <ul className="flex space-x-6">{renderLinks(authLinks)}</ul>

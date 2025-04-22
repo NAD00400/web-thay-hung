@@ -50,11 +50,6 @@ const GoiYSanPhamList = ({ danhMucId }: GoiYSanPhamListProps) => {
   }, [danhMucId]);
 
   const addToCart = async (productId: string) => {
-    if (!customerId) {
-      alert('Vui lòng đăng nhập để thêm vào giỏ hàng.');
-      return;
-    }
-
     try {
       const res = await fetch('/api/gio-hang', {
         method: 'POST',

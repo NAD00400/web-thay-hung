@@ -13,7 +13,8 @@ export default function Home() {
   
   return (
   <>
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100"
+    >
       {/* Hero Section */}
       <section 
           className="relative text-white text-center bg-cover bg-center h-screen flex flex-col justify-center items-center"

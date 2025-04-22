@@ -30,31 +30,25 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-
     const {
       ma_khach_hang,
-      tong_tien_don_hang,
       phuong_thuc_thanh_toan,
+      chi_tiet_don_hang,
       ghi_chu,
-      chi_tiet_san_pham, // Array gồm: ma_san_pham, so_luong, gia_tien, so_do
+      thanh_toan,
       giao_hang,
-      thanh_toan
     } = body;
-
-    // 1. Tạo đơn hàng
     const donHang = await prisma.donHang.create({
       data: {
         ma_khach_hang,
-        tong_tien_don_hang,
         trang_thai_don_hang: 'CHO_XAC_NHAN',
         phuong_thuc_thanh_toan,
-        thanh_toan_thanh_cong: false,
         ghi_chu: ghi_chu || null,
       },
     });
 
     // 2. Tạo chi tiết đơn hàng + số đo nếu có
-    for (const item of chi_tiet_san_pham) {
+    for (const item of chi_tiet_don_hang) {
       const chiTiet = await prisma.chiTietDonHang.create({
         data: {
           ma_don_hang: donHang.ma_don_hang,
@@ -63,16 +57,19 @@ export async function POST(req: NextRequest) {
           gia_tien: item.gia_tien,
         },
       });
-
-      // Nếu có số đo thì thêm
-      if (item.so_do) {
-        await prisma.soDoDatMay.create({
-          data: {
-            ma_chi_tiet_don_hang: chiTiet.ma_chi_tiet_don_hang,
-            ...item.so_do,
-          },
-        });
-      }
+      
+      // DÙNG đúng khóa PK của chi_tiet_don_hang
+      await prisma.soDoDatMay.create({
+        data: {
+          ma_chi_tiet_don_hang: chiTiet.ma_chi_tiet_don_hang,
+          vong_nguc: item.so_do.vong_nguc,
+          vong_eo: item.so_do.vong_eo,
+          vong_hong: item.so_do.vong_hong,
+          be_ngang_vai: item.so_do.be_ngang_vai,
+          chieu_dai_ao: item.so_do.chieu_dai_ao,
+          chieu_dai_quan: item.so_do.chieu_dai_quan,
+        },
+      });      
     }
 
     // 3. Tạo giao hàng
@@ -80,7 +77,7 @@ export async function POST(req: NextRequest) {
       data: {
         ma_don_hang: donHang.ma_don_hang,
         trang_thai: 'CHO_XAC_NHAN',
-        phi_van_chuyen: giao_hang.phi_van_chuyen,
+        phi_van_chuyen: giao_hang.phi_van_chuyen || 0,
         dia_chi_giao_hang: giao_hang.dia_chi_giao_hang,
         ngay_giao_du_kien: giao_hang.ngay_giao_du_kien || null,
       },
@@ -90,10 +87,10 @@ export async function POST(req: NextRequest) {
     await prisma.thanhToan.create({
       data: {
         ma_don_hang: donHang.ma_don_hang,
-        paymentMethod: thanh_toan.paymentMethod,
+        paymentMethod: thanh_toan.paymentMethod || 'COD',
         paymentStatus: thanh_toan.paymentStatus || 'CHUA_THANH_TOAN',
-        transactionId: thanh_toan.transactionId,
-        paymentType: thanh_toan.paymentType,
+        transactionId: thanh_toan.transactionId || "",
+        paymentType: thanh_toan.paymentType || "THANH_TOAN_TOAN_BO",
       },
     });
 

@@ -64,7 +64,7 @@ async function main() {
       ten_san_pham: "Áo Dài Công Sở Linh Ngọc",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070042965-DALL%C2%B7E%202025-03-03%2012.53.33%20-%20A%20refined%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20professionals%2C%20featuring%20a%20charcoal%20gray%20fabric%20with%20a%20minimalist%20geometric%20pattern%20near%20the%20hem.%20The%20design%20is-ktn7SNOKO94UBa1sQXJmEOZXUb1OfP.webp",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070083254-DALL%C2%B7E%202025-03-03%2012.52.47%20-%20A%20stylish%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20professionals%2C%20featuring%20a%20soft%20pastel%20beige%20fabric%20with%20elegant%20button%20details%20along%20the%20collar.%20The%20design%20is-dCGvuyrfJTxC2ZoKMPOHFu6cUJTeeb.webp",
       co_san: false,
     },
   });
@@ -182,9 +182,7 @@ async function main() {
     data: {
       ma_khach_hang: customer.ma_khach_hang,
       trang_thai_don_hang: "CHO_XAC_NHAN",
-      tong_tien_don_hang: 1000000,
       phuong_thuc_thanh_toan: "TIEN_MAT",
-      thanh_toan_thanh_cong: false,
     },
   });
 
@@ -208,7 +206,7 @@ async function main() {
       thue: 0.1,
       ngay_phat_hanh: new Date(),
       ngay_het_han_thanh_toan: new Date(),
-      trang_thanh_toan: "CHUA_THANH_TOAN",
+      trang_thai_thanh_toan: "CHUA_THANH_TOAN",
       ngay_cap_nhat: new Date(),
     },
   });
@@ -250,22 +248,14 @@ async function main() {
     data: {
       ma_chi_tiet_don_hang: order_detail.ma_chi_tiet_don_hang,
       vong_nguc: 90,
-      vong_co: 40,
       vong_eo: 70,
-      be_ngang_vai: 45,
       vong_hong: 95,
+      be_ngang_vai: 45,
       chieu_dai_ao: 120,
-      chieu_dai_tu_vai_toi_eo: 40,
-      chieu_dai_tay_ao: 60,
-      vong_bap_tay: 30,
-      vong_khuy_tay: 20,
-      vong_co_tay: 18,
       chieu_dai_quan: 100,
-      vong_dui: 50,
-      vong_dau_goi: "30",
-      vong_ong_quan: "25",
     },
   });
+  
   await prisma.phuLieuMayMac.create({
     data: {
       vai_chinh: "Cotton 100%",
