@@ -4,25 +4,38 @@ async function main() {
   console.log("Seeding database...");
 
   // 🌱 Tạo dữ liệu giả cho bảng nguoi_dung
-  const user = await prisma.nguoiDung.create({
-    data: {
-      email_nguoi_dung: "anhduynguyenkhuat@gmail.com",
-      ten_nguoi_dung: "anh duy",
-      vai_tro: "ADMIN",
-      link_anh_dai_dien: "linkAnhDaiDien",
-      firebaseId: "csS8qQLEYbSm6cfILnrwcR4cMmm2",
-    },
+  let user = await prisma.nguoiDung.findUnique({
+    where: { email_nguoi_dung: "anhduynguyenkhuat@gmail.com" },
   });
 
+  if (!user) {
+    user = await prisma.nguoiDung.create({
+      data: {
+        email_nguoi_dung: "anhduynguyenkhuat@gmail.com",
+        ten_nguoi_dung: "anh duy",
+        vai_tro: "ADMIN",
+        link_anh_dai_dien: "linkAnhDaiDien",
+        firebaseId: "csS8qQLEYbSm6cfILnrwcR4cMmm2",
+      },
+    });
+  }
+
   // 🌱 Tạo khách hàng dựa trên user
-  const customer = await prisma.khachHang.create({
-    data: {
-      ten_khach_hang: "Lê Thị Tuyết",
-      ma_nguoi_dung: user.ma_nguoi_dung,
-      so_dien_thoai: "0123456789",
-      dia_chi_khach_hang: "123 Đường ABC, TP.HCM",
-    },
+  let customer = await prisma.khachHang.findUnique({
+    where: { ma_nguoi_dung: user.ma_nguoi_dung },
   });
+  
+  if (!customer) {
+    // Create a new customer if none exists
+    customer = await prisma.khachHang.create({
+      data: {
+        ten_khach_hang: "anh duy",
+        ma_nguoi_dung: user.ma_nguoi_dung,
+        so_dien_thoai: "12345678901234567890",
+        dia_chi_khach_hang: "123 Đường ABC, TP.HCM",
+      },
+    });
+  }
 
   // 🌱 Tạo danh mục sản phẩm
   const category = await prisma.danhMuc.create({
@@ -218,7 +231,7 @@ async function main() {
       ma_khach_hang: customer.ma_khach_hang,
       ngay_hen: new Date(),
       ngay_tao: new Date(),
-      trang: "Chờ xác nhận",
+      trang_thai_lich_hen: "Chờ xác nhận",
     },
   });
 

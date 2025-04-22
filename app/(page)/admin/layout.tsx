@@ -7,7 +7,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <AdminMenu />
 
       {/* Nội dung bên phải */}
-      <div className="flex-1 bg-gradient-to-br from-[#1a1a2e] to-[#16213e] h-full">
+      <div className="flex-1 bg-gradient-to-br from-[#1a1a2e] to-[#16213e] h-full overflow-y-auto scrollbar-hide ">
+
         {children}
       </div>
     </div>

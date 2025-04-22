@@ -20,70 +20,72 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Failed to fetch appointments" }, { status: 500 });
     }
 }
-export async function POST(req: NextRequest) {
-  try {
-    const { ngay_hen, trang_thai_lich_hen, ma_khach_hang, ten_khach_hang, so_dien_thoai, email } = await req.json();
-    const ngayHenDate = new Date(ngay_hen);
 
-    // Kiểm tra xem ngày hẹn có hợp lệ không
-    if (isNaN(ngayHenDate.getTime())) {
-      return NextResponse.json({ error: 'Invalid appointment date' }, { status: 400 });
+export async function POST(req: Request) {
+  try {
+    const { ma_khach_hang, ten_khach_hang, so_dien_thoai, dia_chi_khach_hang, ngay_hen } = await req.json();
+    
+    // Kiểm tra đầu vào
+    if (!ngay_hen || (!ma_khach_hang && (!ten_khach_hang || !so_dien_thoai || !dia_chi_khach_hang))) {
+      return NextResponse.json({ message: "Thiếu thông tin tạo lịch hẹn" }, { status: 400 });
     }
 
-    // Kiểm tra xem khách hàng đã tồn tại chưa
-    const existingCustomer = await prisma.khachHang.findUnique({
-      where: { ma_khach_hang: ma_khach_hang },
+    let customerId: string;
+
+    // Nếu đã có mã khách hàng
+    if (ma_khach_hang) {
+      // Kiểm tra xem khách hàng đã tồn tại
+      const existingCustomer = await prisma.khachHang.findUnique({
+        where: { ma_khach_hang }
+      });
+
+      if (!existingCustomer) {
+        return NextResponse.json({ message: "Khách hàng không tồn tại" }, { status: 400 });
+      }
+
+      customerId = ma_khach_hang;  // Sử dụng mã khách hàng đã có
+    } else {
+      // Nếu không có mã khách hàng, tạo khách hàng mới
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(so_dien_thoai)) {
+        return NextResponse.json({ message: "Số điện thoại không hợp lệ" }, { status: 400 });
+      }
+
+      // Kiểm tra khách hàng đã tồn tại qua số điện thoại
+      const existingCustomer = await prisma.khachHang.findUnique({
+        where: { so_dien_thoai }
+      });
+
+      if (existingCustomer) {
+        return NextResponse.json({ message: "Khách hàng đã tồn tại với số điện thoại này" }, { status: 400 });
+      }
+
+      // Tạo khách hàng mới
+      const newCustomer = await prisma.khachHang.create({
+        data: { 
+          ten_khach_hang, 
+          so_dien_thoai, 
+          dia_chi_khach_hang 
+        }
+      });
+
+      customerId = newCustomer.ma_khach_hang;  // Lấy mã khách hàng mới
+    }
+
+    // Tạo lịch hẹn
+    const timestamp = new Date(ngay_hen).toISOString();
+    const lichHen = await prisma.lichHenKhachHang.create({
+      data: {
+        ma_khach_hang: customerId,
+        ngay_hen: timestamp,
+        trang: 'CHO_XAC_NHAN',  // Có thể thay đổi trạng thái lịch hẹn tùy nhu cầu
+        ngay_tao: new Date().toISOString(),
+      }
     });
 
-    if (!existingCustomer) {
-      // Nếu khách hàng chưa tồn tại, tạo mới khách hàng và người dùng
-      const newCustomer = await prisma.khachHang.create({
-        data: {
-          ten_khach_hang: ten_khach_hang,
-          so_dien_thoai: so_dien_thoai,
-          dia_chi_khach_hang: '', // Provide a default or meaningful value for the address
-          nguoi_dung: {
-            create: {
-              ten_nguoi_dung: ten_khach_hang,
-              email_nguoi_dung: email, // Sửa từ "emai" thành "email"
-              firebaseId: 'firebaseId', // Bạn cần truyền firebaseId từ client nếu có
-              vai_tro: 'KHACH_HANG', 
-              link_anh_dai_dien: 'linkAnhDaiDien', // Có thể truyền ảnh đại diện từ client
-            },
-          },
-        },
-      });
-
-      // Sau khi tạo khách hàng mới, tạo lịch hẹn cho khách hàng
-      const newAppointment = await prisma.lichHenKhachHang.create({
-        data: {
-          ngay_tao: new Date(),
-          ngay_hen: ngayHenDate || new Date(),
-          trang: trang_thai_lich_hen || 'CHO_XAC_NHAN',
-          ma_khach_hang: newCustomer.ma_khach_hang, // Dùng mã khách hàng mới tạo
-        },
-      });
-
-      return NextResponse.json(newAppointment, { status: 201 });
-
-    } else {
-      // Nếu khách hàng đã tồn tại, chỉ tạo lịch hẹn mới cho khách hàng
-      const newAppointment = await prisma.lichHenKhachHang.create({
-        data: {
-          ngay_tao: new Date(),
-          ngay_hen: ngayHenDate || new Date(),
-          trang: trang_thai_lich_hen || 'CHO_XAC_NHAN',
-          ma_khach_hang: ma_khach_hang,
-        },
-      });
-
-      return NextResponse.json(newAppointment, { status: 201 });
-    }
-
+    return NextResponse.json({ message: "Tạo lịch hẹn thành công", data: lichHen });
   } catch (error) {
-    console.error("Error creating appointment:", error);
-    return NextResponse.json({ error: 'Failed to create appointment' }, { status: 500 });
+    console.error("Lỗi khi tạo lịch hẹn:", error);
+    return NextResponse.json({ message: "Lỗi server khi tạo lịch hẹn" }, { status: 500 });
   }
 }
-
-

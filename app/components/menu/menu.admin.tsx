@@ -20,7 +20,7 @@ const AdminMenu = () => {
 
   return (
     <aside className={cn(
-      "h-full transition-all duration-300 backdrop-blur-lg bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-white/20 flex flex-col",
+      "min-h-full transition-all duration-300 backdrop-blur-lg bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-white/20 flex flex-col",
       isOpen ? "w-64" : "w-20"
     )}>
       {/* Toggle Sidebar */}
