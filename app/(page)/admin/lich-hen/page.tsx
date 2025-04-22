@@ -139,10 +139,18 @@ export default function LichHenBoard() {
             <Droppable droppableId={key} key={key}>
               {(provided) => (
                 <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="bg-gradient-to-r from-blue-50 via-indigo-100 to-purple-50 rounded-lg p-6 shadow-xl min-h-[500px] max-h-[80vh] overflow-y-auto flex flex-col transition-all duration-300 hover:shadow-2xl"
-                >
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="bg-gradient-to-r from-blue-50 via-indigo-100 to-purple-50 rounded-lg p-6 shadow-xl min-h-[500px] max-h-[80vh] overflow-y-auto flex flex-col transition-all duration-300 hover:shadow-2xl"
+                style={{
+                  scrollbarWidth: 'none',  // Ẩn thanh cuộn trên Firefox
+                }}
+              >
+                {/* <style jsx>{`
+                  ::-webkit-scrollbar {
+                    display: none;
+                  }
+                `}</style> */}
                   <h2 className="text-center text-xl font-semibold text-gray-700 mb-4">{label}</h2>
 
                   {/* Lọc và hiển thị lịch hẹn theo trạng thái */}
