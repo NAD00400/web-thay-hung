@@ -1,6 +1,5 @@
 'use client';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from "react";
 
 interface SanPhamDatMay {
   ma_san_pham_dat_may: string;
@@ -16,93 +15,102 @@ interface SanPhamDatMay {
 const ITEMS_PER_PAGE = 6;
 
 export function SanPhamTable({ dataSP }: { dataSP: SanPhamDatMay[] }) {
+  const [sanPhamList, setSanPhamList] = useState<SanPhamDatMay[]>(dataSP || []);
   const [selectedSanPham, setSelectedSanPham] = useState<SanPhamDatMay | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+  const [editSanPham, setEditSanPham] = useState<SanPhamDatMay | null>(null);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
-
-  const totalPages = Math.ceil(dataSP.length / ITEMS_PER_PAGE);
-  const currentData = dataSP.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const createSanPham = async (
+    sanPham: Omit<SanPhamDatMay, 'ma_san_pham_dat_may' | 'ngay_tao' | 'ngay_cap_nhat'>
+  ) => {
+    try {
+      const payload = {
+        ...sanPham,
+        ma_san_pham_dat_may: Date.now().toString(),
+        ngay_tao: new Date().toISOString(),
+        ngay_cap_nhat: new Date().toISOString(),
+      };
+      const res = await fetch('/api/sanpham', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Lỗi khi tạo sản phẩm');
+      const newItem: SanPhamDatMay = await res.json();
+      setSanPhamList((prev) => [...prev, newItem]);
+      setSelectedSanPham(newItem);
+      closeModal();
+    } catch {
+      alert('Tạo sản phẩm thất bại');
+    }
   };
 
-  const openModal = () => {
+  const updateSanPham = async (
+    updated: SanPhamDatMay
+  ) => {
+    try {
+      const res = await fetch(`/api/sanpham/${updated.ma_san_pham_dat_may}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...updated, ngay_cap_nhat: new Date().toISOString() }),
+      });
+      if (!res.ok) throw new Error('Cập nhật lỗi');
+      const newData = await res.json();
+      setSanPhamList((prev) =>
+        prev.map((sp) => sp.ma_san_pham_dat_may === newData.ma_san_pham_dat_may ? newData : sp)
+      );
+      setSelectedSanPham(newData);
+      closeModal();
+    } catch {
+      alert('Cập nhật sản phẩm thất bại');
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/vercel-blob', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Upload lỗi');
+      const data = await res.json();
+      return data.url as string;
+    } catch {
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (sanPhamList.length) setSelectedSanPham(sanPhamList[0]);
+  }, [sanPhamList]);
+
+  const handlePageChange = (page: number) => setCurrentPage(page);
+
+  const handleDelete = (ma: string) => {
+    if (confirm('Bạn có chắc muốn xoá sản phẩm này không?')) {
+      setSanPhamList((prev) => prev.filter((sp) => sp.ma_san_pham_dat_may !== ma));
+      if (selectedSanPham?.ma_san_pham_dat_may === ma) setSelectedSanPham(null);
+    }
+  };
+
+  const openModal = (type: 'add' | 'edit', sanPham?: SanPhamDatMay) => {
+    setModalType(type);
+    if (type === 'edit' && sanPham) setEditSanPham(sanPham);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setImageFile(null);
-    setImageUrl('');
-    reset();
+    setEditSanPham(null);
+    setModalType(null);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-    }
-  };
-
-  const handleUploadImage = async () => {
-    if (!imageFile) {
-      alert('Bạn chưa chọn ảnh!');
-      return;
-    }
-    setUploading(true);
-
-    const formData = new FormData();
-    formData.append('file', imageFile);
-
-    try {
-      const res = await fetch('/api/vercel-blob', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (data.url) {
-        setImageUrl(data.url);
-      } else {
-        alert('Tải ảnh thất bại.');
-      }
-    } catch (error) {
-      console.error('Lỗi khi tải ảnh:', error);
-      alert('Có lỗi xảy ra khi tải ảnh.');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const onSubmit = async (formData: any) => {
-    if (!imageUrl) {
-      alert('Bạn chưa upload ảnh sản phẩm');
-      return;
-    }
-
-    const newSP = {
-      ...formData,
-      gia_tien: parseInt(formData.gia_tien),
-      url_image: imageUrl,
-      co_san: formData.co_san === 'true',
-      ngay_tao: new Date().toISOString(),
-      ngay_cap_nhat: new Date().toISOString(),
-    };
-
-    console.log('Thêm sản phẩm:', newSP);
-
-    // Gọi API thêm sản phẩm ở đây...
-    closeModal();
-    reset();
-    setImageFile(null);
-    setImageUrl('');
-  };
+  const totalPages = Math.ceil(sanPhamList.length / ITEMS_PER_PAGE);
+  const currentData = sanPhamList.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="h-screen p-6 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 overflow-hidden bg-gray-50">
@@ -129,7 +137,7 @@ export function SanPhamTable({ dataSP }: { dataSP: SanPhamDatMay[] }) {
         <div className="flex justify-between mb-2">
           <h2 className="text-xl font-bold">Danh Sách Sản Phẩm</h2>
           <button
-            onClick={openModal}
+            onClick={() => openModal('add')}
             className="bg-green-600 text-white px-4 py-1 rounded-lg shadow-md hover:bg-green-700"
           >
             + Thêm
@@ -140,43 +148,42 @@ export function SanPhamTable({ dataSP }: { dataSP: SanPhamDatMay[] }) {
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
                 {['Tên', 'Giá', 'Mô Tả', 'Ngày', 'Loại', 'Hành Động'].map((header) => (
-                  <th key={header} className="px-4 py-3 text-left font-semibold text-gray-800 border-b border-neutral-200">
+                  <th key={header} className="px-4 py-3 text-left font-semibold text-gray-800 border-b">
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {currentData.length > 0 ? (
-                currentData.map((sp) => (
-                  <tr key={sp.ma_san_pham_dat_may} className="border-b border-neutral-200 bg-white hover:bg-gray-100 transition">
-                    <td className="px-4 py-3">{sp.ten_san_pham}</td>
-                    <td className="px-4 py-3">{sp.gia_tien.toLocaleString()} VND</td>
-                    <td className="px-4 py-3 truncate max-w-[200px]" title={sp.mo_ta_san_pham}>{sp.mo_ta_san_pham}</td>
-                    <td className="px-4 py-3">{new Date(sp.ngay_tao).toLocaleDateString()}</td>
-                    <td className={`px-4 py-3 font-semibold ${sp.co_san ? 'text-green-700' : 'text-red-700'}`}>
-                      {sp.co_san ? 'Có sẵn' : 'Đặt may'}
-                    </td>
-                    <td className="px-4 py-3 space-x-2">
-                      <button onClick={() => setSelectedSanPham(sp)} className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Xem</button>
-                      <button onClick={() => {}} className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600">Sửa</button>
-                      <button onClick={() => {}} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">Xoá</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr><td colSpan={6} className="text-center py-4 text-gray-800">Không có sản phẩm nào.</td></tr>
+              {currentData.length ? currentData.map((sp) => (
+                <tr key={sp.ma_san_pham_dat_may} className="border-b hover:bg-gray-100">
+                  <td className="px-4 py-3">{sp.ten_san_pham}</td>
+                  <td className="px-4 py-3">{sp.gia_tien.toLocaleString()} VND</td>
+                  <td className="px-4 py-3 truncate max-w-[200px]" title={sp.mo_ta_san_pham}>{sp.mo_ta_san_pham}</td>
+                  <td className="px-4 py-3">{new Date(sp.ngay_tao).toLocaleDateString()}</td>
+                  <td className={`px-4 py-3 font-semibold ${sp.co_san ? 'text-green-700' : 'text-red-700'}`}>
+                    {sp.co_san ? 'Có sẵn' : 'Đặt may'}
+                  </td>
+                  <td className="px-4 py-3 space-x-2">
+                    <button onClick={() => setSelectedSanPham(sp)} className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Xem</button>
+                    <button onClick={() => openModal('edit', sp)} className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600">Sửa</button>
+                    <button onClick={() => handleDelete(sp.ma_san_pham_dat_may)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">Xoá</button>
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={6} className="text-center py-4 text-gray-800">Không có sản phẩm nào.</td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
-
         <div className="flex justify-center mt-4 gap-2">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i + 1}
               onClick={() => handlePageChange(i + 1)}
-              className={`px-3 py-1 rounded-md border ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} hover:bg-blue-100 transition`}
+              className={`px-3 py-1 rounded-md border ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} hover:bg-blue-100`}
             >
               {i + 1}
             </button>
@@ -187,23 +194,56 @@ export function SanPhamTable({ dataSP }: { dataSP: SanPhamDatMay[] }) {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Thêm Sản Phẩm</h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-              <input {...register('ten_san_pham', { required: true })} placeholder="Tên sản phẩm" className="border px-3 py-2 rounded w-full" />
-              <input {...register('gia_tien', { required: true })} type="number" placeholder="Giá tiền" className="border px-3 py-2 rounded w-full" />
-              <textarea {...register('mo_ta_san_pham')} placeholder="Mô tả sản phẩm" className="border px-3 py-2 rounded w-full" />
-              <select {...register('co_san')} className="border px-3 py-2 rounded w-full">
+            <h2 className="text-lg font-bold mb-4">
+              {modalType === 'add' ? 'Thêm Sản Phẩm' : 'Chỉnh Sửa Sản Phẩm'}
+            </h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const formData = new FormData(form);
+
+                let imageUrl = editSanPham?.url_image || '';
+                const fileInput = form.querySelector('input[name="file_upload"]') as HTMLInputElement;
+                if (fileInput?.files?.length) {
+                  const uploaded = await uploadImage(fileInput.files[0]);
+                  if (uploaded) imageUrl = uploaded;
+                }
+
+                const baseData = {
+                  ten_san_pham: formData.get('ten_san_pham') as string,
+                  gia_tien: Number(formData.get('gia_tien')),
+                  mo_ta_san_pham: formData.get('mo_ta_san_pham') as string,
+                  co_san: formData.get('co_san') === 'true',
+                  url_image: imageUrl,
+                };
+
+                if (modalType === 'add') {
+                  await createSanPham(baseData);
+                } else if (modalType === 'edit' && editSanPham) {
+                  await updateSanPham({
+                    ...editSanPham,
+                    ...baseData,
+                  });
+                }
+              }}
+            >
+              <input name="ten_san_pham" placeholder="Tên sản phẩm" defaultValue={editSanPham?.ten_san_pham || ''} className="w-full mb-2 border rounded p-2" required />
+              <input name="gia_tien" placeholder="Giá tiền" type="number" defaultValue={editSanPham?.gia_tien || ''} className="w-full mb-2 border rounded p-2" required />
+              <textarea name="mo_ta_san_pham" placeholder="Mô tả" defaultValue={editSanPham?.mo_ta_san_pham || ''} className="w-full mb-2 border rounded p-2" required />
+              <label htmlFor="co_san" className="block text-sm font-medium text-gray-700 mb-1">Loại sản phẩm</label>
+              <select id="co_san" name="co_san" defaultValue={editSanPham?.co_san ? 'true' : 'false'} className="w-full mb-2 border rounded p-2">
                 <option value="true">Có sẵn</option>
                 <option value="false">Đặt may</option>
               </select>
-              <input type="file" accept="image/*" onChange={handleImageChange} />
-              <button type="button" onClick={handleUploadImage} disabled={uploading} className="bg-blue-600 text-white px-3 py-1 rounded">
-                {uploading ? 'Đang tải ảnh...' : 'Tải ảnh lên'}
-              </button>
-              {imageUrl && <img src={imageUrl} alt="Preview" className="w-full h-40 object-cover rounded" />}
-              <div className="flex justify-end gap-2 mt-4">
-                <button onClick={closeModal} type="button" className="px-4 py-1 border rounded hover:bg-gray-100">Hủy</button>
-                <button type="submit" className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700">Lưu</button>
+              <label className="block text-sm mb-1 font-medium text-gray-700">Ảnh sản phẩm</label>
+              <label htmlFor="file_upload" className="block text-sm font-medium text-gray-700">Tải lên ảnh sản phẩm</label>
+              <input id="file_upload" name="file_upload" type="file" accept="image/*" className="w-full mb-4" title="Chọn tệp ảnh để tải lên" />
+              <div className="flex justify-end space-x-2">
+                <button type="button" onClick={closeModal} className="px-4 py-1 bg-gray-400 text-white rounded hover:bg-gray-500">Huỷ</button>
+                <button type="submit" className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  {modalType === 'add' ? 'Thêm' : 'Lưu'}
+                </button>
               </div>
             </form>
           </div>
