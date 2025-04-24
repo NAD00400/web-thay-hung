@@ -13,7 +13,7 @@ interface KhachHang {
 interface LichHen {
   ma_lich_hen: string;
   ngay_hen: string;
-  trang: string;
+  trang_thai_lich_hen: string;
   khach_hang: KhachHang;
 }
 
@@ -43,14 +43,9 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({ isOpen
 
       if (res.ok) {
         const data: KhachHang = await res.json();
-        console.log('Dữ liệu khách hàng nhận được:', data);
-        // Fill lists and form
         setFoundCustomer([data]);
         setSelectedCustomer(data);
-        setNewCustomer({
-          ten: data.ten_khach_hang,
-          address: data.dia_chi_khach_hang,
-        });
+        setNewCustomer({ ten: data.ten_khach_hang, address: data.dia_chi_khach_hang });
         setShowNewCustomerForm(true);
       } else if (res.status === 404) {
         setFoundCustomer([]);
@@ -67,19 +62,17 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({ isOpen
   };
 
   const formatToTimestamp = (dateString: string) => {
-    // Chuyển đổi chuỗi ngày giờ sang định dạng chuẩn trước khi lấy timestamp
-    const formattedDate = dateString.replace(' ', 'T'); // Chuyển khoảng trắng thành 'T'
-    const date = new Date(formattedDate); // Tạo đối tượng Date
-    return date.getTime(); // Trả về timestamp tính bằng mili giây
+    const formattedDate = dateString.replace(' ', 'T');
+    const date = new Date(formattedDate);
+    return date.getTime();
   };
-  
-  // Sử dụng trong handleSubmit
+
   const handleSubmit = async () => {
     setError('');
     try {
       let customerId: string;
       if (showNewCustomerForm && !selectedCustomer) {
-        // create new customer
+        // Tạo mới khách hàng
         const resCust = await fetch('/api/khach-hang', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -87,7 +80,6 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({ isOpen
             ten_khach_hang: newCustomer.ten,
             so_dien_thoai: searchPhone.trim(),
             dia_chi_khach_hang: newCustomer.address,
-           
           }),
         });
         const custData = await resCust.json();
@@ -98,37 +90,33 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({ isOpen
       } else {
         throw new Error('Vui lòng chọn hoặc tạo khách hàng');
       }
-  
-      // Chuyển đổi ngày hẹn sang timestamp
+
       const timestamp = formatToTimestamp(ngayHen);
-  
       const resAppt = await fetch('/api/lich-hen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ma_khach_hang: customerId,
-          ngay_hen: timestamp, // Gửi timestamp thay vì chuỗi ngày giờ
+          ngay_hen: timestamp,
           trang_thai_lich_hen: 'CHO_XAC_NHAN',
         }),
       });
       const apptData = await resAppt.json();
       if (!resAppt.ok) throw new Error(apptData.message || 'Lỗi thêm lịch hẹn');
-      onCreated(apptData.lichHen);
+
+      // Lấy đúng object lịch hẹn từ trường `data`
+      const newAppt: LichHen = apptData.data;
+      onCreated(newAppt);
       onClose();
     } catch (err) {
       setError((err as Error).message);
     }
   };
-  
-  
 
   const handleSelectCustomer = (customer: KhachHang) => {
     setSelectedCustomer(customer);
     setSearchPhone(customer.so_dien_thoai);
-    setNewCustomer({
-      ten: customer.ten_khach_hang,
-      address: customer.dia_chi_khach_hang,
-    });
+    setNewCustomer({ ten: customer.ten_khach_hang, address: customer.dia_chi_khach_hang });
     setShowNewCustomerForm(true);
   };
 

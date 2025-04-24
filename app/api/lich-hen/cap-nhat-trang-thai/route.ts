@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   
       const lichHen = await prisma.lichHenKhachHang.update({
         where: { ma_lich_hen },
-        data: { trang: trang_thai_lich_hen },
+        data: { trang_thai_lich_hen: trang_thai_lich_hen },
       });
 
       return NextResponse.json({ message: 'Cập nhật thành công', lichHen });

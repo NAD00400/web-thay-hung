@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       }
 
       // Kiểm tra khách hàng đã tồn tại qua số điện thoại
-      const existingCustomer = await prisma.khachHang.findUnique({
+      const existingCustomer = await prisma.khachHang.findFirst({
         where: { so_dien_thoai }
       });
 
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       data: {
         ma_khach_hang: customerId,
         ngay_hen: timestamp,
-        trang: 'CHO_XAC_NHAN',  // Có thể thay đổi trạng thái lịch hẹn tùy nhu cầu
+        trang_thai_lich_hen: 'CHO_XAC_NHAN',  // Có thể thay đổi trạng thái lịch hẹn tùy nhu cầu
         ngay_tao: new Date().toISOString(),
       }
     });

@@ -103,7 +103,7 @@ model LichHenKhachHang {
   ma_khach_hang String
   ngay_hen      DateTime
   ngay_tao      DateTime
-  trang         String
+  trang_thai_lich_hen String
   khach_hang    KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade)
 }
 
