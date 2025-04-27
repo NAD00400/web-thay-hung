@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import StorySection from "./components/cuahang/cuahang.storys";
 import ContactSection from "./components/cuahang/cuahang.contact";
+import BookingSection from "./components/lichhen/BookingSection";
 import SanPhamList from "./components/sanpham/sanpham.list";
 import SanPhamPage from "./(page)/san-pham/page";
 import { useUser } from "./lib/context";
@@ -28,6 +29,8 @@ export default function Home() {
         </div>
       </section>
       <StorySection />
+
+      <BookingSection />
       
       <ContactSection />
       

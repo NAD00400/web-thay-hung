@@ -33,10 +33,14 @@ export async function PUT(req: NextRequest, { params }: { params: { 'ma-khach-ha
     }
 
     try {
-        const {dia_chi_khach_hang,so_dien_thoai} = await req.json();
+        const { ten_khach_hang, dia_chi_khach_hang, so_dien_thoai } = await req.json();
         const updatedCustomer = await prisma.khachHang.update({
             where: { ma_khach_hang: maKhachHang },
-            data: {dia_chi_khach_hang,so_dien_thoai},
+            data: {
+                ten_khach_hang,
+                dia_chi_khach_hang,
+                so_dien_thoai,
+            },
         });
 
         return NextResponse.json(updatedCustomer);
@@ -47,6 +51,7 @@ export async function PUT(req: NextRequest, { params }: { params: { 'ma-khach-ha
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
 
 export async function DELETE(req: NextRequest, { params }: { params: { 'ma-khach-hang': string } }) {
     const { 'ma-khach-hang': maKhachHang } = await params; // await params
