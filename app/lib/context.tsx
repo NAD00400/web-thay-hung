@@ -1,74 +1,64 @@
-"use client";
+import { onAuthStateChanged, signOut as firebaseSignOut } from "@firebase/auth";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { auth } from "./firebase";
+import { Loader2 } from "lucide-react";
 
-import {createContext,useContext,useEffect,useState,ReactNode} from "react";
-import {User,
-  onAuthStateChanged,
-  signOut as firebaseSignOut,
-} from "firebase/auth";
-import { auth } from "../lib/firebase";
-
+// Đây là kiểu dữ liệu từ backend, bạn có thể tùy chỉnh
 interface UserContextType {
-  user: User | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
-  setUser: (user: User | null) => void;
+  user: any | null; // nếu bạn có interface riêng cho user backend, hãy thay thế "any"
+  setUser: (user: any | null) => void;
+  signOut: () => void;
 }
 
 const UserContext = createContext<UserContextType>({
-    user: null,
-    loading: true,
-    signOut: async () => { },
-    setUser: function (user: User | null): void {
-        throw new Error("Function not implemented.");
-    }
+  user: null,
+  setUser: () => {},
+  signOut: () => {},
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [hasSavedToDB, setHasSavedToDB] = useState(false); // tránh gọi API nhiều lần
+  const [user, setUser] = useState<any>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      setLoading(false);
-
-      if (user && !hasSavedToDB) {
-        try {
-          // Gọi API backend để lưu thông tin người dùng
-          await fetch("/api/nguoi-dung", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              ma_nguoi_dung: user.uid,
-              email_nguoi_dung: user.email,
-              ten_nguoi_dung: user.displayName,
-              link_anh_dai_dien: user.photoURL,
-              vai_tro: "KHACH_HANG", // Hoặc vai trò khác tùy theo yêu cầu
-              firebaseId: user.uid,
-            }),
-          });
-
-          setHasSavedToDB(true);
-        } catch (error) {
-          console.error("Lỗi khi lưu user vào DB:", error);
-        }
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const res = await fetch(`/api/khach-hang/firebase/${firebaseUser.uid}`);
+        const data = await res.json();
+        setUser(data); // Cập nhật context
+        localStorage.setItem("user", JSON.stringify(data)); // Lưu vào localStorage nếu cần
+      } else {
+        setUser(null); // Nếu không có user, đặt lại context
+        localStorage.removeItem("user"); // Xóa thông tin user trong localStorage
       }
+      setIsLoading(false);
     });
 
-    return () => unsubscribe();
-  }, [hasSavedToDB]);
+    return () => unsubscribe(); // Clean up khi component unmount
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="mt-4 text-sm text-muted-foreground">Đang kiểm tra phiên đăng nhập...</p>
+      </div>
+    );
+  }
 
   const signOut = async () => {
-    await firebaseSignOut(auth);
-    setUser(null);
-    setHasSavedToDB(false);
+    try {
+      await firebaseSignOut(auth); // Đăng xuất khỏi Firebase
+      setUser(null); // Cập nhật lại context khi đăng xuất
+      localStorage.removeItem("user"); // Xóa user trong localStorage khi đăng xuất
+      console.log("Đăng xuất thành công");
+    } catch (error) {
+      console.error("Lỗi khi đăng xuất:", error);
+    }
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, signOut, setUser }}>
+    <UserContext.Provider value={{ user, setUser, signOut }}>
       {children}
     </UserContext.Provider>
   );

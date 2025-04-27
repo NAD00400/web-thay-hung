@@ -1,99 +1,78 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-enum TrangThaiDonHang {
-  CHO_XAC_NHAN
-  DANG_XU_LY
-  DANG_VAN_CHUYEN
-  DA_GIAO
-  DA_HUY
-}
-enum PhuongThucThanhToan {
-  ZALOPAY
-  CHUYEN_KHOAN
-  TIEN_MAT
-}
-enum TrangThaiThanhToan {
-  CHUA_THANH_TOAN
-  DA_THANH_TOAN
-  CHO_XAC_NHAN
-}
-enum VaiTroNguoiDung {
-  KHACH_HANG
-  ADMIN
-  NHAN_VIEN
-}
+
 model ChiTietDonHang {
-  ma_chi_tiet_don_hang String @id @default(uuid())
+  ma_chi_tiet_don_hang String        @id @default(uuid())
   ma_don_hang          String
   ma_san_pham          String
   so_luong             Int
   gia_tien             Float
-
-  don_hang DonHang @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade, onUpdate: Cascade)
-  san_pham SanPhamDatMay @relation(fields: [ma_san_pham], references: [ma_san_pham_dat_may], onDelete: Restrict, onUpdate: Cascade)
-  SoDoDatMay SoDoDatMay?
+  don_hang             DonHang       @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade)
+  san_pham             SanPhamDatMay @relation(fields: [ma_san_pham], references: [ma_san_pham_dat_may])
+  SoDoDatMay           SoDoDatMay?
 }
+
 model ChiTietGioHang {
-  ma_chi_tiet_gio_hang String @id @default(uuid())
+  ma_chi_tiet_gio_hang String        @id @default(uuid())
   ma_gio_hang          String
   ma_san_pham_dat_may  String
   so_luong             Int
-
-  gio_hang GioHang @relation(fields: [ma_gio_hang], references: [ma_gio_hang])
-  san_pham SanPhamDatMay @relation(fields: [ma_san_pham_dat_may], references: [ma_san_pham_dat_may], onDelete: Restrict, onUpdate: Cascade)
+  gio_hang             GioHang       @relation(fields: [ma_gio_hang], references: [ma_gio_hang])
+  san_pham             SanPhamDatMay @relation(fields: [ma_san_pham_dat_may], references: [ma_san_pham_dat_may])
 }
+
 model DanhMuc {
-  ma_danh_muc   String @id @default(uuid())
-  ten_danh_muc  String
-  danh_muc_slug String @unique
-  url_image     String
+  ma_danh_muc      String          @id @default(uuid())
+  ten_danh_muc     String
+  danh_muc_slug    String          @unique
+  url_image        String
   san_pham_dat_may SanPhamDatMay[]
 }
-model DonHang {
-  ma_don_hang            String              @id @default(uuid())
-  ma_khach_hang          String
-  ngay_dat_hang          DateTime            @default(now())
-  trang_thai_don_hang    TrangThaiDonHang
-  tong_tien_don_hang     Float
-  phuong_thuc_thanh_toan PhuongThucThanhToan
-  thanh_toan_thanh_cong  Boolean
-  ghi_chu                String?
-  ngay_cap_nhat          DateTime            @default(now())
 
-  khach_hang KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade, onUpdate: Cascade)
-  chi_tiet_don_hang ChiTietDonHang[]
-  hoa_don           HoaDon?
-  giao_hang         GiaoHang?
-  thanh_toan        ThanhToan?
+model DonHang {
+  ma_don_hang            String           @id @default(uuid())
+  ma_khach_hang          String
+  ngay_dat_hang          DateTime         @default(now())
+  ghi_chu                String?
+  ngay_cap_nhat          DateTime         @default(now())
+  trang_thai_don_hang    String?
+  phuong_thuc_thanh_toan String?
+  chi_tiet_don_hang      ChiTietDonHang[]
+  khach_hang             KhachHang        @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade)
+  giao_hang              GiaoHang?
+  hoa_don                HoaDon?
+  thanh_toan             ThanhToan?
 }
+
 model GiaoHang {
-  ma_giao_hang      String           @id @default(uuid())
-  ma_don_hang       String           @unique
-  trang_thai        TrangThaiDonHang
+  ma_giao_hang      String    @id @default(uuid())
+  ma_don_hang       String    @unique
   phi_van_chuyen    Float
   dia_chi_giao_hang String
   ngay_giao_du_kien DateTime?
   ngay_giao_thuc_te DateTime?
-
-  don_hang DonHang @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade, onUpdate: Cascade)
+  trang_thai        String
+  don_hang          DonHang   @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade)
 }
+
 model GioHang {
-  ma_gio_hang   String   @id @default(uuid())
-  ma_khach_hang String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
-
+  ma_gio_hang       String           @id @default(uuid())
+  ma_khach_hang     String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now())
   chi_tiet_gio_hang ChiTietGioHang[]
-  khach_hang KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade, onUpdate: Cascade)
+  khach_hang        KhachHang        @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade)
 }
+
 model HoaDon {
-  ma_hoa_don              String             @id @default(uuid())
-  ma_don_hang             String             @unique
+  ma_hoa_don              String   @id @default(uuid())
+  ma_don_hang             String   @unique
   so_hoa_don              String
   tien_can_thanh_toan     Decimal
   tien_da_thanh_toan      Decimal
@@ -101,31 +80,33 @@ model HoaDon {
   ngay_phat_hanh          DateTime
   ngay_het_han_thanh_toan DateTime
   ngay_cap_nhat           DateTime
-  trang_thanh_toan        TrangThaiThanhToan @default(CHUA_THANH_TOAN)
-
-  don_hang DonHang @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade, onUpdate: Cascade)
+  trang_thai_thanh_toan   String
+  don_hang                DonHang  @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade)
 }
+
 model KhachHang {
-  ma_khach_hang      String @id @default(uuid())
-  ten_khach_hang     String @default("Unknown")
-  ma_nguoi_dung      String @unique
+  ma_khach_hang      String             @id @default(uuid())
+  ma_nguoi_dung      String?            @unique  // Trường này nullable, có thể chứa giá trị null
   so_dien_thoai      String
   dia_chi_khach_hang String
-
-  nguoi_dung NguoiDung? @relation(fields: [ma_nguoi_dung], references: [ma_nguoi_dung], onDelete: SetNull, onUpdate: Cascade)
-  don_hang   DonHang[]
-  lich_hen   LichHenKhachHang[]
-  GioHang    GioHang[]
+  ten_khach_hang     String             @default("Unknown")
+  don_hang           DonHang[]          // Mối quan hệ với bảng DonHang
+  GioHang            GioHang[]          // Mối quan hệ với bảng GioHang
+  nguoi_dung         NguoiDung?         @relation(fields: [ma_nguoi_dung], references: [ma_nguoi_dung], onDelete: SetNull)  // Quan hệ tùy chọn với NguoiDung
+  lich_hen           LichHenKhachHang[] // Mối quan hệ với bảng LichHenKhachHang
 }
+
+
+
 model LichHenKhachHang {
-  ma_lich_hen   String   @id @default(uuid())
+  ma_lich_hen   String    @id @default(uuid())
   ma_khach_hang String
   ngay_hen      DateTime
   ngay_tao      DateTime
-  trang         String
-  
-  khach_hang KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade, onUpdate: Cascade)
+  trang_thai_lich_hen String
+  khach_hang    KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade)
 }
+
 model NguoiDung {
   ma_nguoi_dung     String          @id @default(uuid())
   email_nguoi_dung  String          @unique
@@ -134,73 +115,71 @@ model NguoiDung {
   ngay_tao          DateTime        @default(now())
   ngay_cap_nhat     DateTime        @default(now())
   link_anh_dai_dien String?
-  firebaseId        String          @unique
+  firebaseId        String?         @unique
+  mat_khau          String          @default("")
+  khach_hang        KhachHang?
+}
 
-  khach_hang KhachHang?
-}
 model PhuLieuMayMac {
-  ma_phu_lieu   String   @id @default(uuid())
-  vai_chinh     String?
-  chi           String?
-  nut           String?
-  ngay_tao      DateTime @default(now())
-  day_keo       String?
-  ngay_cap_nhat DateTime @default(now())
-  ren           String?
-  vai_lot       String?
-  hat_cuom      String?
-  mech_dung     String?
-  ma_san_pham_dat_may   String         @unique
-  san_pham      SanPhamDatMay @relation(fields: [ma_san_pham_dat_may], references: [ma_san_pham_dat_may], onDelete: Restrict, onUpdate: Cascade)
+  ma_phu_lieu         String        @id @default(uuid())
+  vai_chinh           String?
+  chi                 String?
+  nut                 String?
+  ngay_tao            DateTime      @default(now())
+  day_keo             String?
+  ngay_cap_nhat       DateTime      @default(now())
+  ren                 String?
+  vai_lot             String?
+  hat_cuom            String?
+  mech_dung           String?
+  ma_san_pham_dat_may String        @unique
+  san_pham            SanPhamDatMay @relation(fields: [ma_san_pham_dat_may], references: [ma_san_pham_dat_may])
 }
+
 model SanPhamDatMay {
-  ma_san_pham_dat_may String   @id @default(uuid())
+  ma_san_pham_dat_may String           @id @default(uuid())
   ma_danh_muc         String
   ten_san_pham        String
   gia_tien            Float
   mo_ta_san_pham      String
   url_image           String
-  ngay_tao            DateTime @default(now())
-  ngay_cap_nhat       DateTime @default(now())
-  co_san              Boolean  @default(false)
+  ngay_tao            DateTime         @default(now())
+  ngay_cap_nhat       DateTime         @default(now())
+  co_san              Boolean          @default(false)
   ma_phu_lieu         String?
-
-  danh_muc DanhMuc @relation(fields: [ma_danh_muc], references: [ma_danh_muc], onDelete: Restrict, onUpdate: Cascade)
-  chi_tiet_don_hang ChiTietDonHang[]
-  chi_tiet_gio_hang ChiTietGioHang[]
+  chi_tiet_don_hang   ChiTietDonHang[]
+  chi_tiet_gio_hang   ChiTietGioHang[]
   phu_lieu_may_mac    PhuLieuMayMac?
+  danh_muc            DanhMuc          @relation(fields: [ma_danh_muc], references: [ma_danh_muc])
 }
+
 model SoDoDatMay {
-  ma_so_do                String   @id @default(uuid())
-  ma_chi_tiet_don_hang    String   @unique
-  vong_nguc               Float
-  vong_co                 Float
-  vong_eo                 Float
-  be_ngang_vai            Float
-  vong_hong               Float
-  chieu_dai_ao            Float
-  chieu_dai_tu_vai_toi_eo Float
-  chieu_dai_tay_ao        Float
-  vong_bap_tay            Float
-  vong_khuy_tay           Float
-  vong_co_tay             Float
-  chieu_dai_quan          Float
-  createdAt               DateTime @default(now())
-  vong_dui                Float
-  vong_dau_goi            String?
-  vong_ong_quan           String?
-
-  chi_tiet_don_hang ChiTietDonHang @relation(fields: [ma_chi_tiet_don_hang], references: [ma_chi_tiet_don_hang], onDelete: Cascade, onUpdate: Cascade)
+  ma_so_do             String         @id @default(uuid())
+  ma_chi_tiet_don_hang String         @unique
+  vong_nguc            Float
+  vong_eo              Float
+  be_ngang_vai         Float
+  vong_hong            Float
+  chieu_dai_ao         Float
+  chieu_dai_quan       Float
+  createdAt            DateTime       @default(now())
+  chi_tiet_don_hang    ChiTietDonHang @relation(fields: [ma_chi_tiet_don_hang], references: [ma_chi_tiet_don_hang], onDelete: Cascade)
 }
-model ThanhToan {
-  ma_thanh_toan String              @id @default(uuid())
-  ma_don_hang   String              @unique
-  paymentMethod PhuongThucThanhToan
-  paymentStatus TrangThaiThanhToan
-  transactionId String              @unique
-  createdAt     DateTime            @default(now())
-  paymentDate   DateTime            @default(now())
-  paymentType   String
 
-  don_hang DonHang @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade, onUpdate: Cascade)
+model ThanhToan {
+  ma_thanh_toan String   @id @default(uuid())
+  ma_don_hang   String   @unique
+  transactionId String   @unique
+  createdAt     DateTime @default(now())
+  paymentDate   DateTime @default(now())
+  paymentType   String
+  paymentMethod String
+  paymentStatus String
+  don_hang      DonHang  @relation(fields: [ma_don_hang], references: [ma_don_hang], onDelete: Cascade)
+}
+
+enum VaiTroNguoiDung {
+  KHACH_HANG
+  ADMIN
+  NHAN_VIEN
 }

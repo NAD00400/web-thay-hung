@@ -1,161 +1,154 @@
-'use client';
+"use client";
 
 import { useUser } from "@/app/lib/context";
-import { fetchKhachHangByNguoiDungId, fetchNguoiDungByFirebaseId } from "@/app/lib/fetchData";
-import { SanPhamDatMay } from "@prisma/client";
-import { log } from "console";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaCartArrowDown } from "react-icons/fa";
 
 const itemsPerPage = 8;
 
-const SanPhamList = ({ sanPham }: { sanPham: SanPhamDatMay[] }) => {
-    const { user } = useUser();
-    const userId = user?.uid;
-    const [userData, setUserData] = useState<any>(null);
-    const [customerData, setCustomerData] = useState<any>(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filter, setFilter] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-useEffect(() => {
-    const fetchData = async () => {
-      if (!userId) {
-        console.log("Chưa có userId từ Firebase");
-        return;
-      }
-      try {
-        const fetchedUserData = await fetchNguoiDungByFirebaseId(userId);
-        console.log("(fetchedUserData);",fetchedUserData);
-      
-        setUserData(fetchedUserData);
-        if (fetchedUserData?.ma_nguoi_dung) {
-          const fetchedCustomerData = await fetchKhachHangByNguoiDungId(fetchedUserData.ma_nguoi_dung);
-          console.log("fetchedCustomerData",fetchedCustomerData);
-          
-          setCustomerData(fetchedCustomerData);
-        } else {
-          console.warn("Không có ma_nguoi_dung trong userData");
-        }
-      } catch (error) {
-        console.error("Error fetching user or customer data:", error);
-      }
-    };
-    fetchData();
-  }, [userId]);
-  
+const SanPhamList = ({ sanPham }: { sanPham: any[] }) => {
+  const router = useRouter();
+  const { user } = useUser();
 
-  // Tính toán danh sách sản phẩm đã lọc
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const isGuest = !user;
+
+  // Lưu tạm sản phẩm vào sessionStorage
+  function addProductToTempCart(item: {
+    id: string;
+    name: string;
+    image: string;
+    price: number;
+    so_luong: number;
+  }) {
+    const key = "temp_cart";
+    const current: typeof item[] = JSON.parse(sessionStorage.getItem(key) || "[]");
+    const found = current.find((i) => i.id === item.id);
+    if (found) {
+      found.so_luong += 1;
+    } else {
+      current.push({ ...item, so_luong: 1 });
+    }
+    sessionStorage.setItem(key, JSON.stringify(current));
+  }
+
   const filteredSanPham = useMemo(() => {
-    let updatedList = [...sanPham];
+    let list = [...sanPham];
     if (searchTerm) {
-      updatedList = updatedList.filter(product =>
-        product.ten_san_pham.toLowerCase().includes(searchTerm.toLowerCase())
+      list = list.filter((p) =>
+        p.ten_san_pham.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    if (filter === 'price-asc') {
-      updatedList.sort((a, b) => a.gia_tien - b.gia_tien);
-    } else if (filter === 'price-desc') {
-      updatedList.sort((a, b) => b.gia_tien - a.gia_tien);
-    }
-    return updatedList;
+    if (filter === "price-asc") list.sort((a, b) => a.gia_tien - b.gia_tien);
+    else if (filter === "price-desc") list.sort((a, b) => b.gia_tien - a.gia_tien);
+    return list;
   }, [sanPham, searchTerm, filter]);
 
-  // Reset trang hiện tại khi danh sách sản phẩm thay đổi
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filteredSanPham]);
+  useEffect(() => setCurrentPage(1), [filteredSanPham]);
 
-  // Phân trang
-  const totalPages = useMemo(
-    () => Math.ceil(filteredSanPham.length / itemsPerPage),
-    [filteredSanPham]
+  const totalPages = Math.ceil(filteredSanPham.length / itemsPerPage);
+  const currentItems = filteredSanPham.slice(
+    (currentPage - 1) * itemsPerPage,
+    (currentPage - 1) * itemsPerPage + itemsPerPage
   );
-  const currentItems = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredSanPham.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredSanPham, currentPage]);
 
-  const addToCart = async (productId: string, customerId: string) => {
-    try {
-      const response = await fetch('/api/gio-hang', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, customerId }),
+  const addToCart = async (product: any) => {
+    if (!user?.customer?.ma_khach_hang) {
+      addProductToTempCart({
+        id: product.ma_san_pham_dat_may,
+        name: product.ten_san_pham,
+        image: product.url_image || "/placeholder-image.png",
+        price: product.gia_tien,
+        so_luong: 1,
       });
-      if (!response.ok) {
-        throw new Error('Failed to add product to cart');
-      }
-      alert('Sản phẩm đã được thêm vào giỏ hàng.');
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
-      alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+      alert("Sản phẩm đã được lưu tạm vào giỏ hàng.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/gio-hang", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product.ma_san_pham_dat_may,
+          customerId: user.customer.ma_khach_hang,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to add");
+      alert("Sản phẩm đã được thêm vào giỏ hàng.");
+      sessionStorage.setItem("cart_updated", "true");
+    } catch (err) {
+      console.error(err);
+      alert("Có lỗi khi thêm sản phẩm.");
     }
   };
 
   return (
     <>
-      <div className="mb-6 flex justify-between items-center bg-neutral-100 p-4 rounded-lg shadow-sm">
+      {/* Bộ lọc */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-lg border border-neutral-700">
         <input
           type="text"
           placeholder="Tìm kiếm sản phẩm..."
-          className="border border-neutral-300 bg-neutral-50 rounded-lg px-4 py-2 w-full max-w-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+          className="w-full sm:max-w-sm px-4 py-2 rounded-md bg-black text-white border border-neutral-600 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <select
-          className="border border-neutral-300 bg-neutral-50 rounded-lg px-4 py-2 ml-4 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+          className="w-full sm:w-auto px-4 py-2 rounded-md bg-black text-white border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
-          <option value="">📌 Lọc theo</option>
-          <option value="price-asc">📈 Giá tăng dần</option>
-          <option value="price-desc">📉 Giá giảm dần</option>
+          <option value="">Lọc theo</option>
+          <option value="price-asc">Giá tăng dần</option>
+          <option value="price-desc">Giá giảm dần</option>
         </select>
       </div>
 
+      {/* Danh sách sản phẩm */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {currentItems.length === 0 ? (
           <p className="text-center text-neutral-500 col-span-full">
-            Không tìm thấy sản phẩm phù hợp.
+            Không tìm thấy sản phẩm.
           </p>
         ) : (
-          currentItems.map(product => (
+          currentItems.map((product) => (
             <div
               key={product.ma_san_pham_dat_may}
-              className="border border-neutral-300 rounded-lg p-5 shadow-md hover:shadow-lg transition-shadow bg-black/10"
+              className="bg-neutral-950 border border-neutral-700 rounded-lg p-5"
             >
-              <div className="w-full aspect-[10/12] bg-neutral-200 rounded-lg mb-4 overflow-hidden">
+              <div className="relative w-full aspect-square mb-4 bg-gray-900 rounded-md overflow-hidden">
                 <Image
-                  src={product.url_image || '/placeholder-image.png'}
+                  src={product.url_image || "/placeholder-image.png"}
                   alt={product.ten_san_pham}
-                  width={250}
-                  height={5500}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
-              <h2 className="font-semibold mb-2 text-neutral-800">
-                {product.ten_san_pham}
-              </h2>
-              <p className="text-neutral-600 mb-4 text-sm">
-                {product.mo_ta_san_pham}
+              <h2 className="font-semibold mb-2 text-white">{product.ten_san_pham}</h2>
+              <p className="text-neutral-400 mb-4 text-sm">{product.mo_ta_san_pham}</p>
+              <p className="font-bold text-white mb-4">
+                {product.gia_tien?.toLocaleString("vi-VN") || "N/A"} VND
               </p>
-              <p className="font-bold text-neutral-900 mb-4">
-                {product.gia_tien ? product.gia_tien.toLocaleString('vi-VN') : 'N/A'} VND
-              </p>
-              <div className="flex justify-between gap-2">
+              <div className="flex gap-3">
                 <button
-                  className="px-4 py-2 bg-white text-black rounded-lg hover:bg-neutral-100 transition-colors w-full shadow-md hover:shadow-lg border border-neutral-300"
-                  onClick={() =>
-                    addToCart(product.ma_san_pham_dat_may, customerData?.ma_khach_hang|| '')
-                  }
+                  onClick={() => addToCart(product)}
+                  className="flex-1 flex items-center justify-center py-2 px-4 rounded-lg border border-neutral-600 bg-transparent text-white hover:border-red-500 hover:text-red-500 transition-colors"
                 >
-                  <FaCartArrowDown />
+                  <FaCartArrowDown className="w-5 h-5" />
                 </button>
                 <button
-                  className="px-4 py-2 bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors w-full shadow-md hover:shadow-lg"
+                  onClick={() =>
+                    router.push(`/san-pham/san-pham-chi-tiet/${product.ma_san_pham_dat_may}`)
+                  }
+                  className="flex-1 flex items-center justify-center py-2 px-4 rounded-lg border border-neutral-600 bg-transparent text-white hover:border-neutral-400 hover:text-neutral-400 transition-colors"
                 >
-                  Xem Chi Tiết
+                  Xem
                 </button>
               </div>
             </div>
@@ -163,19 +156,20 @@ useEffect(() => {
         )}
       </div>
 
+      {/* Phân trang */}
       {filteredSanPham.length > itemsPerPage && (
-        <div className="mt-8 flex flex-wrap justify-center items-center gap-2">
-          {Array.from({ length: totalPages }, (_, index) => (
+        <div className="mt-8 flex justify-center gap-2">
+          {Array.from({ length: totalPages }, (_, idx) => (
             <button
-              key={index}
+              key={idx}
               className={`px-3 py-1 rounded-full ${
-                currentPage === index + 1
-                  ? 'bg-neutral-700 text-white'
-                  : 'bg-neutral-200 text-neutral-800 hover:bg-neutral-300'
+                currentPage === idx + 1
+                  ? "bg-neutral-700 text-white"
+                  : "bg-neutral-200 text-neutral-800 hover:bg-neutral-300"
               }`}
-              onClick={() => setCurrentPage(index + 1)}
+              onClick={() => setCurrentPage(idx + 1)}
             >
-              {index + 1}
+              {idx + 1}
             </button>
           ))}
         </div>

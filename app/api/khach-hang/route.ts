@@ -36,11 +36,11 @@ export async function GET() {
 // POST API: Create a new customer
 export async function POST(request: Request) {
     try {
-        const {ma_nguoi_dung,so_dien_thoai,dia_chi_khach_hang ,ten_khach_hang} = await request.json();
+        const {so_dien_thoai,dia_chi_khach_hang ,ten_khach_hang} = await request.json();
         const newCustomer = await prisma.khachHang.create({
             data: {
                 ten_khach_hang,
-                ma_nguoi_dung,
+                
                 so_dien_thoai,
                 dia_chi_khach_hang,
             },

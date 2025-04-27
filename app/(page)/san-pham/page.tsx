@@ -8,7 +8,7 @@ export default async function SanPhamPage() {
 
     
     return (
-        <div className="p-5 pt-24 font-sans bg-neutral-100 min-h-screen">
+        <div className="p-5 pt-24 font-sans bg-gray-100 min-h-screen">
             <SanPhamList sanPham={sanPham} />
         </div>
     );

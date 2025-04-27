@@ -7,12 +7,12 @@ const images = [
         text: "Sự tỉ mỉ trong từng đường kim mũi chỉ tạo nên những bộ áo dài hoàn hảo."
     },
     {
-        src: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/lien%20he/ChatGPT%20Image%20Mar%2029%2C%202025%2C%2007_54_40%20PM-Evw34QtdL1Pijg8o177ZD7Y872uLZA.png",
+        src: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/lien%20he/ChatGPT%20Image%20Apr%2014%2C%202025%2C%2001_05_26%20AM-LJh6jvYsdoyekWRqK0UtJ5Thr0qDd9.png",
         alt: "Hình ảnh áo dài",
         text: "Kết hợp phong cách truyền thống và hiện đại để tạo nên sự độc đáo."
     },
     {
-        src: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/lien%20he/ChatGPT%20Image%20Mar%2029%2C%202025%2C%2007_54_40%20PM-Evw34QtdL1Pijg8o177ZD7Y872uLZA.png",
+        src: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/lien%20he/ChatGPT%20Image%20Apr%2014%2C%202025%2C%2008_09_46%20AM-QWjig2Shm4A40qCMbJusMlyZA9YvSq.png",
         alt: "Hình ảnh vải cao cấp",
         text: "Lựa chọn chất liệu cao cấp, mềm mại và thoáng mát cho người mặc."
     }

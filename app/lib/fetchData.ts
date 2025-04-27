@@ -25,6 +25,7 @@ async function fetchData(endpoint: string) {
 export const fetchSanPham = () => fetchData('/api/san-pham');
 export const fetchSanPhamChiTiet = (id: string) => fetchData(`/api/san-pham/${id}`);
 
+
 export const fetchDonHang = () => fetchData('/api/don-hang');
 export const fetchDonHangChiTiet = (id: string) => fetchData(`/api/don-hang/${id}`);
 
@@ -46,6 +47,9 @@ export const fetchDonHangChiTietByIdPhuLieu = (id: string) =>
 
 export const fetchDonHangChiTietByIdLichHen = (id: string) =>
     fetchData(`/api/don-hang/lich-hen/${id}`);
+
+export const fetchSanPhamByDanhMucId = (id: string) =>
+    fetchData(`/api/san-pham/danh-muc/${id}`);
 
 export const fetchDonHangChiTietByIdNguoiDung = (id: string) =>
     fetchData(`/api/don-hang/nguoi-dung/${id}`);

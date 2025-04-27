@@ -4,25 +4,38 @@ async function main() {
   console.log("Seeding database...");
 
   // 🌱 Tạo dữ liệu giả cho bảng nguoi_dung
-  const user = await prisma.nguoiDung.create({
-    data: {
-      email_nguoi_dung: "user222222@example.com",
-      ten_nguoi_dung: "Nguyen Van A",
-      vai_tro: "KHACH_HANG",
-      link_anh_dai_dien: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070068726-DALL%C2%B7E%202025-03-03%2012.53.06%20-%20A%20contemporary%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20wear%2C%20featuring%20a%20dark%20green%20fabric%20with%20subtle%20floral%20embroidery%20on%20the%20chest.%20The%20design%20is%20sleek%20with%20a-hVcSOlrM1vfLrpOD00dyn3ybZUIQAZ.webp",
-      firebaseId: "firebase124422",
-    },
+  let user = await prisma.nguoiDung.findUnique({
+    where: { email_nguoi_dung: "anhduynguyenkhuat@gmail.com" },
   });
 
+  if (!user) {
+    user = await prisma.nguoiDung.create({
+      data: {
+        email_nguoi_dung: "anhduynguyenkhuat@gmail.com",
+        ten_nguoi_dung: "anh duy",
+        vai_tro: "ADMIN",
+        link_anh_dai_dien: "linkAnhDaiDien",
+        firebaseId: "csS8qQLEYbSm6cfILnrwcR4cMmm2",
+      },
+    });
+  }
+
   // 🌱 Tạo khách hàng dựa trên user
-  const customer = await prisma.khachHang.create({
-    data: {
-      ten_khach_hang: "Lê Thị Tuyết",
-      ma_nguoi_dung: user.ma_nguoi_dung,
-      so_dien_thoai: "0123456789",
-      dia_chi_khach_hang: "123 Đường ABC, TP.HCM",
-    },
+  let customer = await prisma.khachHang.findUnique({
+    where: { ma_nguoi_dung: user.ma_nguoi_dung },
   });
+  
+  if (!customer) {
+    // Create a new customer if none exists
+    customer = await prisma.khachHang.create({
+      data: {
+        ten_khach_hang: "anh duy",
+        ma_nguoi_dung: user.ma_nguoi_dung,
+        so_dien_thoai: "12345678901234567890",
+        dia_chi_khach_hang: "123 Đường ABC, TP.HCM",
+      },
+    });
+  }
 
   // 🌱 Tạo danh mục sản phẩm
   const category = await prisma.danhMuc.create({
@@ -64,7 +77,7 @@ async function main() {
       ten_san_pham: "Áo Dài Công Sở Linh Ngọc",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070042965-DALL%C2%B7E%202025-03-03%2012.53.33%20-%20A%20refined%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20professionals%2C%20featuring%20a%20charcoal%20gray%20fabric%20with%20a%20minimalist%20geometric%20pattern%20near%20the%20hem.%20The%20design%20is-ktn7SNOKO94UBa1sQXJmEOZXUb1OfP.webp",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070083254-DALL%C2%B7E%202025-03-03%2012.52.47%20-%20A%20stylish%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20professionals%2C%20featuring%20a%20soft%20pastel%20beige%20fabric%20with%20elegant%20button%20details%20along%20the%20collar.%20The%20design%20is-dCGvuyrfJTxC2ZoKMPOHFu6cUJTeeb.webp",
       co_san: false,
     },
   });
@@ -182,9 +195,7 @@ async function main() {
     data: {
       ma_khach_hang: customer.ma_khach_hang,
       trang_thai_don_hang: "CHO_XAC_NHAN",
-      tong_tien_don_hang: 1000000,
       phuong_thuc_thanh_toan: "TIEN_MAT",
-      thanh_toan_thanh_cong: false,
     },
   });
 
@@ -208,7 +219,7 @@ async function main() {
       thue: 0.1,
       ngay_phat_hanh: new Date(),
       ngay_het_han_thanh_toan: new Date(),
-      trang_thanh_toan: "CHUA_THANH_TOAN",
+      trang_thai_thanh_toan: "CHUA_THANH_TOAN",
       ngay_cap_nhat: new Date(),
     },
   });
@@ -220,7 +231,7 @@ async function main() {
       ma_khach_hang: customer.ma_khach_hang,
       ngay_hen: new Date(),
       ngay_tao: new Date(),
-      trang: "Chờ xác nhận",
+      trang_thai_lich_hen: "Chờ xác nhận",
     },
   });
 
@@ -250,22 +261,14 @@ async function main() {
     data: {
       ma_chi_tiet_don_hang: order_detail.ma_chi_tiet_don_hang,
       vong_nguc: 90,
-      vong_co: 40,
       vong_eo: 70,
-      be_ngang_vai: 45,
       vong_hong: 95,
+      be_ngang_vai: 45,
       chieu_dai_ao: 120,
-      chieu_dai_tu_vai_toi_eo: 40,
-      chieu_dai_tay_ao: 60,
-      vong_bap_tay: 30,
-      vong_khuy_tay: 20,
-      vong_co_tay: 18,
       chieu_dai_quan: 100,
-      vong_dui: 50,
-      vong_dau_goi: "30",
-      vong_ong_quan: "25",
     },
   });
+  
   await prisma.phuLieuMayMac.create({
     data: {
       vai_chinh: "Cotton 100%",
@@ -315,6 +318,8 @@ main()
 // npx prisma db push để push schema lên cơ sở dữ liệu
 // npx prisma db pull để pull schema từ cơ sở dữ liệu
 
+
+// gio lam tiep xong commit lai  
 
 
 

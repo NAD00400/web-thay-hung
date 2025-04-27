@@ -22,32 +22,46 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // PUT API
 export async function PUT(req: NextRequest, { params }: { params: { 'ma-lich-hen': string } }) {
-    const maLichHen = params['ma-lich-hen'];
-    const body = await req.json();
+  const maLichHen = params['ma-lich-hen'];
+  const body = await req.json();
 
-    try {
-        const updatedRecord = await prisma.lichHenKhachHang.update({
-            where: { ma_lich_hen: maLichHen },
-            data: body,
-        });
-        return NextResponse.json(updatedRecord);
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to update data' }, { status: 500 });
-    }
+  console.log('Received body:', body); // Kiểm tra dữ liệu nhận được từ frontend
+
+  try {
+    const updatedRecord = await prisma.lichHenKhachHang.update({
+      where: { ma_lich_hen: maLichHen },
+      data: body,
+    });
+
+    console.log('Updated record:', updatedRecord); // Kiểm tra dữ liệu đã được cập nhật
+
+    return NextResponse.json({ success: true, data: updatedRecord });
+  } catch (error) {
+    console.error('Error updating record:', error);
+    return NextResponse.json({ error: 'Failed to update data' }, { status: 500 });
+  }
 }
 
+
 // DELETE API
-export async function DELETE(req: NextRequest, { params }: { params: { ma_lich_hen: string } }) {
-    const { ma_lich_hen } = params;
-  
-    try {
-      await prisma.lichHenKhachHang.delete({
-        where: { ma_lich_hen },
-      });
-  
-      return NextResponse.json({ message: 'Record deleted successfully' });
-    } catch (error) {
-      return NextResponse.json({ error: 'Failed to delete data' }, { status: 500 });
-    }
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { 'ma-lich-hen': string } }
+) {
+  const ma_lich_hen = params['ma-lich-hen']; 
+
+  if (!ma_lich_hen) {
+    return NextResponse.json({ success: false, message: 'Thiếu mã lịch hẹn' }, { status: 400 });
   }
-  
+
+  try {
+    await prisma.lichHenKhachHang.delete({
+      where: { ma_lich_hen },
+    });
+
+    return NextResponse.json({ success: true, message: 'Xóa lịch hẹn thành công' }, { status: 200 });
+  } catch (error) {
+    console.error('Lỗi khi xóa lịch hẹn:', error);
+    return NextResponse.json({ success: false, message: 'Xóa lịch hẹn thất bại' }, { status: 500 });
+  }
+}

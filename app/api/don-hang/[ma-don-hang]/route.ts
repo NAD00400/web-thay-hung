@@ -1,32 +1,42 @@
 import { prisma } from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-// GET API Route
-export async function GET(req: NextRequest, { params }: { params: { "ma-don-hang": string } }) {
+
+export async function GET(req: NextRequest) {
     try {
-        const { "ma-don-hang": maDonHang } = params;
-        if (!maDonHang) {
-            return NextResponse.json({ error: 'Missing ma-don-hang parameter' }, { status: 400 });
-        }
-        const order = await prisma.donHang.findUnique({
-            where: { ma_don_hang: maDonHang },
+      const url = new URL(req.url);
+      const paths = url.pathname.split('/');
+      const ma_don_hang = paths[paths.length - 1]; // lấy mã đơn hàng từ URL
+  
+      console.log("ma_don_hang:", ma_don_hang);
+  
+      const donHang = await prisma.donHang.findUnique({
+        where: { ma_don_hang },
+        include: {
+          khach_hang: true,
+          chi_tiet_don_hang: {
             include: {
-                chi_tiet_don_hang: {
-                    include: {
-                        san_pham: true,   // Lấy thông tin sản phẩm đặt may
-                        SoDoDatMay: true, // Lấy thông tin số đo đặt may
-                    },
-                },
+              san_pham: true,
+              SoDoDatMay: true,
             },
-        });
-        if (!order) {
-            return NextResponse.json({ error: `Order ${maDonHang} not found` }, { status: 404 });
-        }
-        return NextResponse.json(order, { status: 200 });
+          },
+          giao_hang: true,
+          thanh_toan: true,
+          hoa_don: true,
+        },
+      });
+  
+      if (!donHang) {
+        return NextResponse.json({ error: "Đơn hàng không tồn tại" }, { status: 404 });
+      }
+  
+      return NextResponse.json(donHang);
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      console.error("Lỗi Prisma:", error);
+      return NextResponse.json({ error: "Lỗi máy chủ" }, { status: 500 });
     }
-}
+  }
+
+
 // DELETE API Route
 export async function DELETE(req: NextRequest, { params }: { params: { "ma-don-hang": string } }) {
     const { "ma-don-hang": maDonHang} = params; 

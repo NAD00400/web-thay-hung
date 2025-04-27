@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
+
 const HeaderComponent: React.FC = () => {
-  const { user, loading, signOut } = useUser(); // Lấy thông tin người dùng từ context
+  const { user, signOut } = useUser(); // Lấy thông tin người dùng từ context
   const router = usePathname();
   const [showAlert, setShowAlert] = useState(false);
 
@@ -37,7 +38,7 @@ const HeaderComponent: React.FC = () => {
       <li key={href}>
         <Link
           href={href}
-          className={`text-gray-700 hover:text-neutral-900 ${isActive(href) ? 'text-neutral-900 font-bold' : ''}`}
+          className={`text-gray-50 hover:text-white ${isActive(href) ? 'text-white font-bold' : ''}`}
           onClick={onClick}
         >
           {label}
@@ -45,37 +46,22 @@ const HeaderComponent: React.FC = () => {
       </li>
     ));
 
-  if (loading) {
-    return (
-      <header className="bg-white shadow-md py-4 opacity-70 fixed top-0 left-0 w-full backdrop-blur-md z-50 transition-all duration-300">
-        <div className="container mx-auto flex justify-between items-center px-4">
-          <h1 className="text-xl font-bold text-gray-800">Nhà May Thiên Kim</h1>
-          <div className="flex items-center space-x-8">
-            <nav>
-              <ul className="flex space-x-6">{renderLinks(navLinks)}</ul>
-            </nav>
-            <nav>
-              <ul className="flex space-x-6">{renderLinks(authLinks)}</ul>
-            </nav>
-          </div>
-        </div>
-      </header>
-    );
-  }
+  
 
   return (
     <>
-      {showAlert && (
-        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 backdrop-blur-md text-white px-4 py-2 rounded shadow-lg z-50">
-          Đăng nhập thành công!
-        </div>
-      )}
-      <header className="bg-white shadow-md py-4 opacity-70 fixed top-0 left-0 w-full backdrop-blur-md z-50 transition-all duration-300">
+      
+      <header className="py-4 opacity-70 fixed top-0 left-0 w-full backdrop-blur-md z-50 transition-all duration-300" 
+      style={{
+        backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/background/ChatGPT%20Image%2018_52_55%2020%20thg%204%2C%202025-7Vo8MBW1HHSxLyxsE7eQAsnxIoSwJC.png')",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+      }}>
         <div className="container mx-auto flex justify-between items-center px-4">
-          <h1 className="text-xl font-bold text-gray-800">Nhà May Thiên Kim</h1>
+          <h1 className="text-xl font-bold text-white">Nhà May Thiên Kim</h1>
           <div className="flex items-center space-x-8">
             <nav>
-              <ul className="flex space-x-6">{renderLinks(navLinks)}</ul>
+              <ul className="flex space-x-6 ">{renderLinks(navLinks)}</ul>
             </nav>
             <nav>
               <ul className="flex space-x-6">{renderLinks(authLinks)}</ul>
