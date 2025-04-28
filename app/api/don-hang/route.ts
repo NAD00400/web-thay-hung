@@ -5,21 +5,19 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest) {
     try {
         const donHangs = await prisma.donHang.findMany({
-            include: {
-                khach_hang: {
-                    include: {
-                        nguoi_dung: true,
-                    },
-                },
-                chi_tiet_don_hang: {
-                    include: {
-                        san_pham: true,
-                    },
-                },
+          select: {
+            ma_don_hang: true,
+            ngay_dat_hang: true,
+            trang_thai_don_hang: true,
+            khach_hang: {
+              select: {
+                ten_khach_hang: true,
+                dia_chi_khach_hang: true,
+                so_dien_thoai: true,
+              },
             },
-            orderBy: {
-                ngay_dat_hang: 'desc',
-            },
+          },
+          orderBy: { ngay_dat_hang: 'desc' },
         });
         return NextResponse.json(donHangs, { status: 200 });
     } catch (error) {

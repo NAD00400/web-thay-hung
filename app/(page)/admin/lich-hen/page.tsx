@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface KhachHang {
   ma_khach_hang: string;
@@ -184,87 +188,86 @@ export default function LichHenBoard() {
   };
 
   return (
-    <>
-      <div className="flex justify-between items-center m-6">
-        <h1 className="text-4xl font-bold text-gray-800">Lịch Hẹn</h1>
-        <div className="flex items-center space-x-4">
-          <label className="text-lg font-semibold text-gray-900">Sắp xếp theo:</label>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
-            className="px-4 py-2 border border-blue-500 rounded-md focus:outline-none"
-          >
-            <option value="newest">Mới nhất</option>
-            <option value="oldest">Cũ nhất</option>
-          </select>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
+    <div className="px-6 py-4">
+      <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+        
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-50">Sắp xếp:</span>
+            <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as 'newest' | 'oldest')}>
+              <SelectTrigger className="w-[120px] text-white">
+                <SelectValue placeholder="Chọn"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Mới nhất</SelectItem>
+                <SelectItem value="oldest">Cũ nhất</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button onClick={() => setIsModalOpen(true)}>
             Thêm lịch hẹn
-          </button>
+          </Button>
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-30 backdrop-blur-sm">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
-            <h2 className="text-xl font-semibold mb-4">Thêm lịch hẹn</h2>
-            <div className="mb-2">
-              <input
-                type="text"
+      {/* Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Thêm lịch hẹn mới</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input
                 placeholder="Nhập số điện thoại"
                 value={searchPhone}
                 onChange={(e) => setSearchPhone(e.target.value)}
-                className="w-full p-2 border rounded"
               />
-              <button onClick={handleSearch} className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
-                <Search className="inline-block w-4 h-4 mr-2" />Tìm khách hàng
-              </button>
+              <Button onClick={handleSearch} variant="secondary">
+                <Search className="w-4 h-4 mr-2" /> Tìm
+              </Button>
             </div>
+
             {showNewCustomerForm && (
-              <div className="space-y-2">
-                <input
-                  type="text"
+              <div className="space-y-3">
+                <Input
                   placeholder="Tên khách hàng"
                   value={newCustomer.ten}
                   onChange={(e) => setNewCustomer({ ...newCustomer, ten: e.target.value })}
-                  className="w-full p-2 border rounded"
                 />
-                <input
-                  type="text"
+                <Input
                   placeholder="Địa chỉ"
                   value={newCustomer.address}
                   onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
-                  className="w-full p-2 border rounded"
                 />
-                <input
+                <Input
                   type="datetime-local"
                   value={ngayHen}
                   onChange={(e) => setNgayHen(e.target.value)}
-                  className="w-full p-2 border rounded"
                 />
-                {error && <div className="text-red-500 text-sm">{error}</div>}
-                <button onClick={handleSubmit} className="w-full bg-green-600 text-white p-2 rounded">
+                {error && <p className="text-sm text-red-500">{error}</p>}
+                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleSubmit}>
                   Tạo lịch hẹn
-                </button>
+                </Button>
               </div>
             )}
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
+      {/* Drag & Drop Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-6">
           {STATUS_COLUMNS.map(({ key, label }) => (
             <Droppable droppableId={key} key={key}>
               {(provided) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="bg-gray-50 rounded-lg p-4 shadow min-h-[400px] flex flex-col"
+                  className="bg-gray-50 rounded-xl p-4 shadow-sm min-h-[400px] flex flex-col"
                 >
-                  <h2 className="text-center font-semibold mb-2">{label}</h2>
+                  <h2 className="text-center font-semibold text-gray-700 mb-2">{label}</h2>
                   {appointments
                     .filter((appt) => appt.trang_thai_lich_hen === key)
                     .map((appt, idx) => (
@@ -275,17 +278,15 @@ export default function LichHenBoard() {
                             {...prov.draggableProps}
                             {...prov.dragHandleProps}
                             className={classNames(
-                              'p-3 mb-3 rounded shadow',
-                              snap.isDragging && 'ring-2 ring-blue-400',
+                              "bg-white rounded-lg p-3 mb-3 shadow-sm",
+                              snap.isDragging && "ring-2 ring-blue-400",
                               getAppointmentColor(appt)
                             )}
                           >
-                            <div className="flex justify-between">
-                              <span className="font-bold">{appt.khach_hang ? appt.khach_hang.ten_khach_hang : "Khách hàng không xác định"}</span>
-
-                              <span className="text-sm">{new Date(appt.ngay_hen).toLocaleString()}</span>
+                            <div className="flex justify-between text-sm font-medium text-gray-800">
+                              <span>{appt.khach_hang?.ten_khach_hang}</span>
+                              <span>{new Date(appt.ngay_hen).toLocaleDateString()}</span>
                             </div>
-                            <div className="text-xs mt-1">{key}</div>
                           </div>
                         )}
                       </Draggable>
@@ -297,6 +298,16 @@ export default function LichHenBoard() {
           ))}
         </div>
       </DragDropContext>
-    </>
+    </div>
   );
 }
+
+
+
+
+
+
+
+
+
+

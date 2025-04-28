@@ -1,23 +1,23 @@
-// app/api/upload/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { put } from '@vercel/blob';
 
 export async function POST(req: NextRequest) {
-  const formData = await req.formData();
-  const file: File | null = formData.get('file') as unknown as File;
-
-  if (!file) {
-    return NextResponse.json({ error: 'Không có file nào được gửi lên' }, { status: 400 });
-  }
-
   try {
-    const blob = await put(file.name, file, {
-      access: 'public',
-    });
+    // <-- đây sẽ parse được Multipart form-data
+    const formData = await req.formData();
+    const maybeFile = formData.get('file');
+
+    if (!(maybeFile instanceof File)) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    }
+
+    const file = maybeFile as File;
+    // put(name, file, { access })
+    const blob = await put(file.name, file, { access: 'public' });
 
     return NextResponse.json({ url: blob.url });
   } catch (err) {
-    console.error('Lỗi upload:', err);
-    return NextResponse.json({ error: 'Lỗi khi upload ảnh' }, { status: 500 });
+    console.error('Vercel Blob upload error:', err);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

@@ -24,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: { 'ma-hoa-don'
 export async function PUT(req: NextRequest, { params }: { params: { 'ma-hoa-don': string } }) {
     const { 'ma-hoa-don': maHoaDon } = params;
     const {
-        trang_thanh_toan,
+        trang_thai_thanh_toan,
         tien_da_thanh_toan,
         tien_can_thanh_toan,
         thue,
@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest, { params }: { params: { 'ma-hoa-don'
             where: { ma_hoa_don: maHoaDon },
             data: {
                 ngay_cap_nhat: new Date(),
-                trang_thanh_toan,
+                trang_thai_thanh_toan,
                 tien_da_thanh_toan,
                 tien_can_thanh_toan,
                 thue,

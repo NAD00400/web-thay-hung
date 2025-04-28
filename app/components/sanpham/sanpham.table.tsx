@@ -1,6 +1,20 @@
 'use client';
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '@/components/ui/drawer';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import ImageUpload from './upload.img.sanpham';
 
 interface SanPhamDatMay {
   ma_san_pham_dat_may: string;
@@ -17,198 +31,190 @@ const ITEMS_PER_PAGE = 6;
 
 export function SanPhamTable({ dataSP }: { dataSP: SanPhamDatMay[] }) {
   const [selectedSanPham, setSelectedSanPham] = useState<SanPhamDatMay | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm();
 
   const totalPages = Math.ceil(dataSP.length / ITEMS_PER_PAGE);
   const currentData = dataSP.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const openModal = () => setShowModal(true);
+  const closeModal = () => { setShowModal(false); setImageUrl(''); reset(); };
+  const openDrawer = (sp: SanPhamDatMay) => { setSelectedSanPham(sp); setDrawerOpen(true); };
+  const closeDrawer = () => { setDrawerOpen(false); setSelectedSanPham(null); };
 
-  const openModal = () => {
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setImageFile(null);
-    setImageUrl('');
-    reset();
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-    }
-  };
-
-  const handleUploadImage = async () => {
-    if (!imageFile) {
-      alert('Bạn chưa chọn ảnh!');
-      return;
-    }
-    setUploading(true);
-
-    const formData = new FormData();
-    formData.append('file', imageFile);
-
-    try {
-      const res = await fetch('/api/vercel-blob', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (data.url) {
-        setImageUrl(data.url);
-      } else {
-        alert('Tải ảnh thất bại.');
-      }
-    } catch (error) {
-      console.error('Lỗi khi tải ảnh:', error);
-      alert('Có lỗi xảy ra khi tải ảnh.');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const onSubmit = async (formData: any) => {
-    if (!imageUrl) {
-      alert('Bạn chưa upload ảnh sản phẩm');
-      return;
-    }
-
+  const onSubmit = (formData: any) => {
+    if (!imageUrl) return alert('Bạn chưa upload ảnh sản phẩm');
     const newSP = {
       ...formData,
-      gia_tien: parseInt(formData.gia_tien),
-      url_image: imageUrl,
+      gia_tien: Number(formData.gia_tien),
+      url_image: imageUrl, // Đảm bảo rằng đây là URL ảnh đã được upload
       co_san: formData.co_san === 'true',
       ngay_tao: new Date().toISOString(),
       ngay_cap_nhat: new Date().toISOString(),
     };
-
     console.log('Thêm sản phẩm:', newSP);
-
-    // Gọi API thêm sản phẩm ở đây...
+    // API call thêm sản phẩm...
     closeModal();
-    reset();
-    setImageFile(null);
-    setImageUrl('');
   };
-
   return (
-    <div className="h-screen p-6 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 overflow-hidden bg-gray-50">
-      <div className="bg-white shadow-lg rounded-xl p-6 overflow-auto">
-        {selectedSanPham ? (
-          <>
-            <h2 className="text-xl font-bold mb-4">Chi Tiết Sản Phẩm</h2>
-            <img src={selectedSanPham.url_image} alt={selectedSanPham.ten_san_pham} className="w-full h-60 object-cover rounded mb-4" />
-            <div className="space-y-2 text-sm text-gray-800">
-              <p><strong>Tên:</strong> {selectedSanPham.ten_san_pham}</p>
-              <p><strong>Giá:</strong> {selectedSanPham.gia_tien.toLocaleString()} VND</p>
-              <p><strong>Mô Tả:</strong> {selectedSanPham.mo_ta_san_pham}</p>
-              <p><strong>Ngày Tạo:</strong> {new Date(selectedSanPham.ngay_tao).toLocaleDateString()}</p>
-              <p><strong>Ngày Cập Nhật:</strong> {new Date(selectedSanPham.ngay_cap_nhat).toLocaleDateString()}</p>
-              <p><strong>Loại:</strong> {selectedSanPham.co_san ? 'Có sẵn' : 'Đặt may'}</p>
-            </div>
-          </>
-        ) : (
-          <p className="text-gray-800">Không có sản phẩm nào được chọn.</p>
-        )}
-      </div>
-
-      <div className="flex flex-col h-full overflow-hidden">
-        <div className="flex justify-between mb-2">
-          <h2 className="text-xl font-bold">Danh Sách Sản Phẩm</h2>
-          <button
-            onClick={openModal}
-            className="bg-green-600 text-white px-4 py-1 rounded-lg shadow-md hover:bg-green-700"
-          >
-            + Thêm
-          </button>
-        </div>
-        <div className="flex-1 overflow-auto">
-          <table className="w-full table-auto bg-white shadow-lg rounded-xl overflow-hidden">
-            <thead className="bg-gray-100 sticky top-0 z-10">
-              <tr>
-                {['Tên', 'Giá', 'Mô Tả', 'Ngày', 'Loại', 'Hành Động'].map((header) => (
-                  <th key={header} className="px-4 py-3 text-left font-semibold text-gray-800 border-b border-neutral-200">
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentData.length > 0 ? (
-                currentData.map((sp) => (
-                  <tr key={sp.ma_san_pham_dat_may} className="border-b border-neutral-200 bg-white hover:bg-gray-100 transition">
-                    <td className="px-4 py-3">{sp.ten_san_pham}</td>
-                    <td className="px-4 py-3">{sp.gia_tien.toLocaleString()} VND</td>
-                    <td className="px-4 py-3 truncate max-w-[200px]" title={sp.mo_ta_san_pham}>{sp.mo_ta_san_pham}</td>
-                    <td className="px-4 py-3">{new Date(sp.ngay_tao).toLocaleDateString()}</td>
-                    <td className={`px-4 py-3 font-semibold ${sp.co_san ? 'text-green-700' : 'text-red-700'}`}>
-                      {sp.co_san ? 'Có sẵn' : 'Đặt may'}
-                    </td>
-                    <td className="px-4 py-3 space-x-2">
-                      <button onClick={() => setSelectedSanPham(sp)} className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Xem</button>
-                      <button onClick={() => {}} className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600">Sửa</button>
-                      <button onClick={() => {}} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">Xoá</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr><td colSpan={6} className="text-center py-4 text-gray-800">Không có sản phẩm nào.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex justify-center mt-4 gap-2">
+    <div className="h-screen p-6 flex flex-col space-y-4 bg-gray-50">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-2">
           {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => handlePageChange(i + 1)}
-              className={`px-3 py-1 rounded-md border ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} hover:bg-blue-100 transition`}
+            <Button
+              key={i}
+              variant={currentPage === i + 1 ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCurrentPage(i + 1)}
             >
               {i + 1}
-            </button>
+            </Button>
           ))}
         </div>
+        <Button onClick={openModal}>Thêm sản phẩm</Button>
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Thêm Sản Phẩm</h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-              <input {...register('ten_san_pham', { required: true })} placeholder="Tên sản phẩm" className="border px-3 py-2 rounded w-full" />
-              <input {...register('gia_tien', { required: true })} type="number" placeholder="Giá tiền" className="border px-3 py-2 rounded w-full" />
-              <textarea {...register('mo_ta_san_pham')} placeholder="Mô tả sản phẩm" className="border px-3 py-2 rounded w-full" />
-              <select {...register('co_san')} className="border px-3 py-2 rounded w-full">
-                <option value="true">Có sẵn</option>
-                <option value="false">Đặt may</option>
-              </select>
-              <input type="file" accept="image/*" onChange={handleImageChange} />
-              <button type="button" onClick={handleUploadImage} disabled={uploading} className="bg-blue-600 text-white px-3 py-1 rounded">
-                {uploading ? 'Đang tải ảnh...' : 'Tải ảnh lên'}
-              </button>
-              {imageUrl && <img src={imageUrl} alt="Preview" className="w-full h-40 object-cover rounded" />}
-              <div className="flex justify-end gap-2 mt-4">
-                <button onClick={closeModal} type="button" className="px-4 py-1 border rounded hover:bg-gray-100">Hủy</button>
-                <button type="submit" className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700">Lưu</button>
-              </div>
-            </form>
+      {/* Product Table */}
+      <Card className="flex-1 overflow-auto">
+        <CardHeader>
+          <CardTitle>Danh sách sản phẩm</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ScrollArea className="h-[calc(100vh-200px)] p-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/2">Tên</TableHead>
+                  <TableHead className="w-1/4">Giá</TableHead>
+                  <TableHead className="w-1/4 text-right">Hành động</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentData.map(sp => (
+                  <TableRow key={sp.ma_san_pham_dat_may} className="hover:bg-gray-100">
+                    <TableCell onClick={() => openDrawer(sp)} className="cursor-pointer">
+                      {sp.ten_san_pham}
+                    </TableCell>
+                    <TableCell>{sp.gia_tien.toLocaleString()} VND</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button size="sm" onClick={() => openDrawer(sp)}>Xem</Button>
+                      <Button size="sm" variant="destructive">Xoá</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+  <DrawerContent className="px-0">
+    <DrawerHeader className="text-center border-b">
+      <DrawerTitle className="text-xl">Chi tiết sản phẩm</DrawerTitle>
+    </DrawerHeader>
+
+    {/* Body */}
+    <div className="p-6 space-y-6 bg-muted/50 h-full overflow-y-auto">
+      {selectedSanPham && (
+        <div className="flex gap-2.5">
+          {/* Hình ảnh sản phẩm */}
+          <div className="w-96 relative rounded-xl overflow-hidden shadow-md">
+            <Image 
+              src={selectedSanPham.url_image} 
+              fill 
+              alt={selectedSanPham.ten_san_pham} 
+              className="object-cover" 
+            />
+          </div>
+
+          {/* Form thông tin */}
+          <div className="space-y-4 w-full">
+            <div className="space-y-2">
+              <Label>Tên sản phẩm</Label>
+              <Input value={selectedSanPham.ten_san_pham} readOnly />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Giá tiền (VND)</Label>
+              <Input value={selectedSanPham.gia_tien.toLocaleString()} readOnly />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Mô tả sản phẩm</Label>
+              <Textarea value={selectedSanPham.mo_ta_san_pham || 'Không có mô tả.'} readOnly rows={4} />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Ngày tạo</Label>
+              <Input value={new Date(selectedSanPham.ngay_tao).toLocaleDateString()} readOnly />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Ngày cập nhật</Label>
+              <Input value={new Date(selectedSanPham.ngay_cap_nhat).toLocaleDateString()} readOnly />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Loại sản phẩm</Label>
+              <Input value={selectedSanPham.co_san ? 'Có sẵn' : 'Đặt may'} readOnly />
+            </div>
           </div>
         </div>
       )}
+    </div>
+
+    <DrawerFooter className="border-t">
+      <Button variant="secondary" className="ml-auto" onClick={closeDrawer}>
+        Đóng
+      </Button>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+      {/* Modal thêm sản phẩm */}
+      {showModal && (
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-lg">
+    <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
+      <h2 className="text-2xl text-gray-800 font-semibold mb-4">Thêm Sản Phẩm</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <Input
+          {...register('ten_san_pham', { required: true })}
+          placeholder="Tên sản phẩm"
+          className="border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        <Input
+          {...register('gia_tien', { required: true })}
+          type="number"
+          placeholder="Giá tiền"
+          className="border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        <Textarea
+          {...register('mo_ta_san_pham')}
+          placeholder="Mô tả sản phẩm"
+          className="border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        <Select {...register('co_san')}>
+          <SelectTrigger className="border-gray-300"><SelectValue placeholder="Loại sản phẩm" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Có sẵn</SelectItem>
+            <SelectItem value="false">Đặt may</SelectItem>
+          </SelectContent>
+        </Select>
+        <ImageUpload onUploadSuccess={(url) => setImageUrl(url)} />
+
+        <div className="flex justify-end space-x-2 mt-4">
+          <Button variant="secondary" onClick={closeModal} className="bg-gray-500 hover:bg-gray-600 text-white">Hủy</Button>
+          <Button type="submit" disabled={!imageUrl} className="bg-blue-600 hover:bg-blue-700 text-white">Lưu</Button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

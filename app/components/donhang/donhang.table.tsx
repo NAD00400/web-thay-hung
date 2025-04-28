@@ -1,169 +1,215 @@
 'use client';
 
 import { useState } from 'react';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from '@/components/ui/drawer';
+import { toast } from 'sonner';
 
-// Hàm xác định màu sắc cho trạng thái đơn hàng
-type OrderStatus = 'CHO_XAC_NHAN' | 'DA_XAC_NHAN' | 'DANG_GIAO' | 'HOAN_THANH' | 'DA_HUY';
+// Types
+export type OrderStatus = 'CHO_XAC_NHAN' | 'DANG_MAY' | 'MAY_XONG';
+export interface KhachHangInfo { ma_khach_hang: string; ma_nguoi_dung: string; so_dien_thoai: string; dia_chi_khach_hang: string; ten_khach_hang: string; }
+export interface SanPhamInfo { ma_san_pham_dat_may: string; ma_danh_muc: string; ten_san_pham: string; gia_tien: number; mo_ta_san_pham: string; url_image: string; ngay_tao: string; ngay_cap_nhat: string; co_san: boolean; ma_phu_lieu: string | null; }
+export interface SoDoDatMay { ma_so_do: string; ma_chi_tiet_don_hang: string; vong_nguc: number; vong_eo: number; be_ngang_vai: number; vong_hong: number; chieu_dai_ao: number; chieu_dai_quan: number; createdAt: string; }
+export interface ChiTietDonHangDetail { ma_chi_tiet_don_hang: string; ma_don_hang: string; ma_san_pham: string; so_luong: number; gia_tien: number; san_pham: SanPhamInfo; SoDoDatMay: SoDoDatMay; }
+export interface GiaoHangInfo { ma_giao_hang: string; ma_don_hang: string; phi_van_chuyen: number; dia_chi_giao_hang: string; ngay_giao_du_kien: string | null; ngay_giao_thuc_te: string | null; trang_thai: string; }
+export interface ThanhToanInfo { ma_thanh_toan: string; ma_don_hang: string; transactionId: string; createdAt: string; paymentDate: string; paymentType: string; paymentMethod: string; paymentStatus: string; }
+export interface HoaDonInfo { ma_hoa_don: string; ma_don_hang: string; so_hoa_don: string; tien_can_thanh_toan: string; tien_da_thanh_toan: string; thue: string; ngay_phat_hanh: string; ngay_het_han_thanh_toan: string; ngay_cap_nhat: string; trang_thai_thanh_toan: string; }
+export interface OrderDetail { ma_don_hang: string; ma_khach_hang: string; ngay_dat_hang: string; ghi_chu: string | null; ngay_cap_nhat: string; trang_thai_don_hang: OrderStatus; phuong_thuc_thanh_toan: string; khach_hang: KhachHangInfo; chi_tiet_don_hang: ChiTietDonHangDetail[]; giao_hang: GiaoHangInfo; thanh_toan: ThanhToanInfo; hoa_don: HoaDonInfo; }
 
-const getStatusColor = (status: OrderStatus) => {
-  const statusColors: Record<OrderStatus, string> = {
-    CHO_XAC_NHAN: 'bg-neutral-200 text-neutral-700',
-    DA_XAC_NHAN: 'bg-blue-200 text-blue-800',
-    DANG_GIAO: 'bg-purple-200 text-purple-800',
-    HOAN_THANH: 'bg-green-200 text-green-800',
-    DA_HUY: 'bg-red-200 text-red-800',
+interface DonHangBoardProps { dataOrder: Pick<OrderDetail, 'ma_don_hang' | 'ngay_dat_hang' | 'trang_thai_don_hang' | 'khach_hang'>[]; }
+
+const STATUS_COLUMNS: { key: OrderStatus; label: string }[] = [
+  { key: 'CHO_XAC_NHAN', label: 'Chờ xác nhận' },
+  { key: 'DANG_MAY', label: 'Đang may' },
+  { key: 'MAY_XONG', label: 'May xong' },
+];
+
+export default function DonHangBoard({ dataOrder }: DonHangBoardProps) {
+  const [orders, setOrders] = useState(dataOrder);
+  const [selected, setSelected] = useState<OrderDetail | null>(null);
+
+  // Fetch chi tiết đơn hàng
+  const handleDetailOrder = async (ma: string) => {
+    try {
+      const res = await fetch(`/api/don-hang/${ma}`, { method: 'GET' });
+      if (!res.ok) throw new Error('Failed to fetch detail');
+      const data: OrderDetail = await res.json();
+      setSelected(data);
+      toast.success('Đã tải chi tiết đơn hàng');
+    } catch (error) {
+      console.error(error);
+      toast.error('Không thể tải chi tiết');
+    }
   };
-  return statusColors[status];
-};
 
-const getStatusText = (status: string | number): string => {
-  const statusMap: Record<OrderStatus, string> = {
-    CHO_XAC_NHAN: 'Chờ xác nhận',
-    DA_XAC_NHAN: 'Đã xác nhận',
-    DANG_GIAO: 'Đang giao',
-    HOAN_THANH: 'Hoàn thành',
-    DA_HUY: 'Đã hủy',
+  // Drag & drop
+  const handleDragEnd = async (result: DropResult) => {
+    const { draggableId, source, destination } = result;
+    if (!destination || destination.droppableId === source.droppableId) return;
+    const newStatus = destination.droppableId as OrderStatus;
+    setOrders(prev =>
+      prev.map(o => (o.ma_don_hang === draggableId ? { ...o, trang_thai_don_hang: newStatus } : o))
+    );
+    try {
+      const res = await fetch('/api/don-hang/cap-nhat-trang-thai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ma_don_hang: draggableId, trang_thai_don_hang: newStatus }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      setOrders(prev =>
+        prev.map(o =>
+          o.ma_don_hang === draggableId ? { ...o, trang_thai_don_hang: source.droppableId as OrderStatus } : o
+        )
+      );
+      toast.error('Cập nhật trạng thái thất bại');
+    }
   };
-  return statusMap[status as OrderStatus] || 'Không xác định';
-};
-interface Order {
-  so_dien_thoai: string;
-  dia_chi_nhan_hang: string;
-  ma_don_hang: string;
-  ma_khach_hang: string;
-  ngay_dat_hang: string;
-  trang_thai_don_hang: OrderStatus;
-  tong_tien_don_hang: number;
-  phuong_thuc_thanh_toan: string;
-  thanh_toan_thanh_cong: boolean;
-  ghi_chu?: string | null;
-  ngay_cap_nhat: string;
-  khach_hang: {
-    ma_khach_hang: string;
-    ten_khach_hang: string;
-    ma_nguoi_dung: string;
-    so_dien_thoai: string;
-    dia_chi_khach_hang: string;
-    nguoi_dung: {
-      ma_nguoi_dung: string;
-      email_nguoi_dung: string;
-      ten_nguoi_dung: string;
-      vai_tro: string;
-      ngay_tao: string;
-      ngay_cap_nhat: string;
-      link_anh_dai_dien: string;
-      firebaseId: string;
-    };
-  };
-  chi_tiet_don_hang: {
-    ma_chi_tiet_don_hang: string;
-    ma_don_hang: string;
-    ma_san_pham: string;
-    so_luong: number;
-    gia_tien: number;
-    san_pham: {
-      ma_san_pham_dat_may: string;
-      ma_danh_muc: string;
-      ten_san_pham: string;
-      gia_tien: number;
-      mo_ta_san_pham: string;
-      url_image: string;
-      ngay_tao: string;
-      ngay_cap_nhat: string;
-      co_san: boolean;
-      ma_phu_lieu?: string | null;
-    };
-  }[];
-}
 
-export default function DonHangDropdown({ dataOrder }: { dataOrder: Order[] }) {
-  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   return (
-    <div className="p-6">
-      <table className="min-w-full table-auto bg-white/40 backdrop-blur-lg shadow-lg rounded-xl overflow-hidden">
-        <thead className="bg-gray-100">
-          <tr>
-            {['Mã Đơn Hàng', 'Mã Khách Hàng', 'Ngày Đặt', 'Trạng Thái', 'Tổng Tiền', 'Thanh Toán', 'Hành Động'].map(
-              (header) => (
-                <th key={header} className="px-4 py-3 text-left font-semibold text-gray-800 border-b border-neutral-200">
-                  {header}
-                </th>
-              )
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {dataOrder && dataOrder.length > 0 ? (
-            dataOrder.map((order) => (
-              <>
-                <tr
-                  key={order.ma_don_hang}
-                  className="border-b border-neutral-200 bg-white hover:bg-gray-100 transition cursor-pointer"
-                  onClick={() => setExpandedOrder(expandedOrder === order.ma_don_hang ? null : order.ma_don_hang)}
+    <div className="p-6 space-y-6">
+      <h2 className="text-2xl font-semibold">Quản lý Đơn hàng</h2>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {STATUS_COLUMNS.map(({ key, label }) => (
+            <Droppable droppableId={key} key={key}>
+              {provided => (
+                <div
+                  ref={provided.innerRef}
+                   {...provided.droppableProps}
+                  className="bg-gray-50 p-4 rounded-lg shadow flex flex-col"
                 >
-                  <td className="px-4 py-3">{order.ma_don_hang}</td>
-                  <td className="px-4 py-3">{order.ma_khach_hang}</td>
-                  <td className="px-4 py-3">{new Date(order.ngay_dat_hang).toLocaleDateString()}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-lg font-medium ${getStatusColor(order.trang_thai_don_hang)}`}>
-                      {getStatusText(order.trang_thai_don_hang)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">{order.tong_tien_don_hang.toLocaleString()} VND</td>
-                  <td className="px-4 py-3">
-                    <span className={`font-semibold ${order.thanh_toan_thanh_cong ? 'text-green-700' : 'text-red-700'}`}>
-                      {order.thanh_toan_thanh_cong ? 'Đã thanh toán' : 'Chưa thanh toán'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Button className="bg-blue-500 text-white px-3 py-1 rounded">Chi tiết</Button>
-                  </td>
-                </tr>
-                {expandedOrder === order.ma_don_hang && (
-                  <tr className="bg-gray-50">
-                    <td colSpan={7} className="p-4">
-                      <div className="bg-white p-4 shadow rounded-lg">
-                        <h2 className="text-xl font-bold mb-4">Chi Tiết Đơn Hàng: {order.ma_don_hang}</h2>
-                        <p>📍 Địa chỉ giao hàng: {order.dia_chi_nhan_hang || 'Không có thông tin'}</p>
-                        <p>📞 Số điện thoại: {order.so_dien_thoai || 'N/A'}</p>
-                        <p>💳 Phương thức thanh toán: {order.phuong_thuc_thanh_toan || 'Không rõ'}</p>
-                        <p>📝 Ghi chú: {order.ghi_chu || 'Không có ghi chú'}</p>
-                        <h3 className="text-lg font-semibold mt-4">Thông tin khách hàng:</h3>
-                        <p>👤 Tên khách hàng: {order.khach_hang?.ten_khach_hang || 'Không rõ'}</p>
-                        <p>📧 Email: {order.khach_hang?.nguoi_dung?.email_nguoi_dung || 'Không rõ'}</p>
-                        <p>🏠 Địa chỉ: {order.khach_hang?.dia_chi_khach_hang || 'Không rõ'}</p>
-                        <h3 className="text-lg font-semibold mt-4">Sản phẩm đặt may:</h3>
-                        {order.chi_tiet_don_hang?.map((detail, index) => (
-                          <div key={index} className="border p-3 mt-2 rounded-lg flex justify-between gap-2">
-                            <div>
-                              <p>🧵 {detail.san_pham?.ten_san_pham}</p>
-                              <p>💵 Giá: {detail.san_pham?.gia_tien?.toLocaleString('vi-VN')} VND</p>
-                              <p>📦 Số lượng: {detail.so_luong}</p>
-                              <p>🖋️ Mô tả: {detail.san_pham?.mo_ta_san_pham || 'Không có mô tả'}</p>
+                  <h3 className="font-medium mb-2 text-gray-700">{label}</h3>
+                  <div className="flex-1 space-y-2 overflow-auto">
+                    {orders
+                      .filter(o => o.trang_thai_don_hang === key)
+                      .map((order, idx) => (
+                        <Draggable key={order.ma_don_hang} draggableId={order.ma_don_hang} index={idx}>
+                          {(prov, snap) => (
+                            <div
+                              ref={prov.innerRef}
+                              {...prov.draggableProps}
+                              {...prov.dragHandleProps}
+                              className={`bg-white p-3 rounded-lg shadow-sm cursor-pointer flex justify-between items-center transition ${
+                                snap.isDragging ? 'ring-2 ring-blue-400' : ''
+                              }`}
+                              onClick={() => handleDetailOrder(order.ma_don_hang)}
+                            >
+                              <div>
+                                <p className="font-semibold text-sm truncate">{order.ma_don_hang}</p>
+                                <p className="text-xs text-gray-500">{order.khach_hang.ten_khach_hang}</p>
+                              </div>
+                              <p className="text-xs text-gray-400">{new Date(order.ngay_dat_hang).toLocaleDateString()}</p>
                             </div>
-                            <img
-                              src={detail.san_pham?.url_image || '/placeholder-image.png'}
-                              alt={detail.san_pham?.ten_san_pham || 'Hình sản phẩm'}
-                              className="w-20 h-20 object-cover mt-2 rounded"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={7} className="text-center py-4 text-gray-800">
-                Không có đơn hàng nào.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+                          )}
+                        </Draggable>
+                      ))}
+                    {provided.placeholder}
+                  </div>
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
+      </DragDropContext>
+
+      {selected && (
+        <Drawer open onOpenChange={() => setSelected(null)}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Chi tiết Đơn hàng: {selected.ma_don_hang}</DrawerTitle>
+              <DrawerClose />
+            </DrawerHeader>
+            <div className="space-y-4 p-4 overflow-auto">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Ghi chú</label>
+                <Textarea
+                  value={selected.ghi_chu || ''}
+                  onChange={e => setSelected(prev => prev ? { ...prev, ghi_chu: e.currentTarget.value } : null)}
+                  className="w-full"
+                  placeholder="Ghi chú"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Tên khách hàng</label>
+                <Input
+                  value={selected.khach_hang.ten_khach_hang}
+                  onChange={e =>
+                    setSelected(prev => prev ? { ...prev, khach_hang: { ...prev.khach_hang, ten_khach_hang: e.currentTarget.value } } : null)
+                  }
+                  placeholder="Tên khách hàng"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                <Input
+                  value={selected.khach_hang.so_dien_thoai}
+                  onChange={e =>
+                    setSelected(prev => prev ? { ...prev, khach_hang: { ...prev.khach_hang, so_dien_thoai: e.currentTarget.value } } : null)
+                  }
+                  placeholder="Số điện thoại"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Địa chỉ khách hàng</label>
+                <Input
+                  value={selected.khach_hang.dia_chi_khach_hang}
+                  onChange={e =>
+                    setSelected(prev => prev ? { ...prev, khach_hang: { ...prev.khach_hang, dia_chi_khach_hang: e.currentTarget.value } } : null)
+                  }
+                  placeholder="Địa chỉ"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Ngày đặt</label>
+                <Input
+                  type="datetime-local"
+                  value={new Date(selected.ngay_dat_hang).toISOString().slice(0,16)}
+                  onChange={e =>
+                    setSelected(prev => prev ? { ...prev, ngay_dat_hang: new Date(e.currentTarget.value).toISOString() } : null)
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
+                <Select
+                  value={selected.trang_thai_don_hang}
+                  onValueChange={value =>
+                    setSelected(prev => prev ? { ...prev, trang_thai_don_hang: value as OrderStatus } : null)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Chọn trạng thái" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_COLUMNS.map(({ key, label }) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex justify-end space-x-2 mt-6">
+                <Button variant="outline" onClick={() => setSelected(null)}>Hủy</Button>
+                <Button onClick={() => {/* TODO: call API to save */ toast.success('Đã lưu thay đổi');}}>Lưu</Button>
+              </div>
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
     </div>
   );
 }

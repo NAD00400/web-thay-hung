@@ -2,7 +2,7 @@ import AdminMenu from "@/app/components/menu/menu.admin";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen  bg-indigo-300">
+    <div className="flex flex-col h-screen bg-indigo-300">
       {/* Menu bên trái */}
       <AdminMenu />
 

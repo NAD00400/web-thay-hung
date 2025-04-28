@@ -1,12 +1,11 @@
-'use client'
+'use client';
+
 import { cn } from "@/lib/utils";
-import { MessageSquareText,LayoutDashboardIcon, ListOrderedIcon, LogOutIcon, MenuIcon, Package2Icon, User2Icon, Calendar1Icon } from "lucide-react";
+import { MessageSquareText, LayoutDashboardIcon, ListOrderedIcon, LogOutIcon, MenuIcon, Package2Icon, User2Icon, Calendar1Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 const menuItems = [
-  // { name: "Bảng Điều Khiển", href: "/admin", icon: LayoutDashboardIcon },
   { name: "Lịch Hẹn", href: "/admin/lich-hen", icon: Calendar1Icon },
   { name: "Đơn Hàng", href: "/admin/don-hang", icon: ListOrderedIcon },
   { name: "Khách Hàng", href: "/admin/khach-hang", icon: User2Icon },
@@ -15,55 +14,44 @@ const menuItems = [
 ];
 
 const AdminMenu = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const pathname = usePathname(); // Lấy đường dẫn hiện tại
+  const pathname = usePathname();
 
   return (
-    <aside className={cn(
-      "min-h-full transition-all duration-300 backdrop-blur-lg bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-white/20 flex flex-col",
-      isOpen ? "w-64" : "w-20"
-    )}>
-      {/* Toggle Sidebar */}
-      <div className="p-6  flex items-center justify-between">
-        <span className={cn("text-white text-lg font-bold", !isOpen && "hidden")}>
+    <nav className="w-full bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-b border-white/20">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+        {/* Logo / Title */}
+        <div className="text-white text-lg font-bold">
           Admin Panel
-        </span>
-        <button onClick={() => setIsOpen(!isOpen)} className="text-white hover:opacity-80">
-          <MenuIcon className="w-6 h-6" />
-        </button>
-      </div>
+        </div>
 
-      {/* Menu */}
-      <nav className="flex-1 px-3 py-5 space-y-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
+        {/* Menu Items */}
+        <div className="flex items-center gap-6">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-md transition-all duration-200 text-white",
-                "hover:bg-white/20",
-                isActive ? "bg-white/30" : "bg-transparent"
-              )}
-            >
-              <Icon className="w-6 h-6" />
-              {isOpen && <span className="text-md">{item.name}</span>}
-            </Link>
-          );
-        })}
-      </nav>
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-2 text-white text-sm font-medium hover:text-blue-400 transition-all",
+                  isActive && "underline underline-offset-4 text-blue-400"
+                )}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+        </div>
 
-      {/* Footer */}
-      <div className="p-[19px] border-t border-white/20 flex items-center justify-between text-sm text-gray-200">
-        {isOpen && <span>© 2025 Admin</span>}
-        <Link href="/" className="flex items-center gap-1 text-white hover:text-red-500">
+        {/* Logout */}
+        <Link href="/" className="text-white hover:text-red-500 transition-all">
           <LogOutIcon className="w-6 h-6" />
         </Link>
       </div>
-    </aside>
+    </nav>
   );
 };
 

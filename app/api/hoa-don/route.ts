@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
                 so_hoa_don: so_hoa_don,
                 ngay_phat_hanh: new Date(),
                 thue: thue,
-                trang_thanh_toan: 'CHO_XAC_NHAN',
+                trang_thai_thanh_toan: 'CHO_XAC_NHAN',
                 tien_can_thanh_toan, // Replace with appropriate value
                 tien_da_thanh_toan, // Replace with appropriate value
                 ngay_cap_nhat: new Date(),
