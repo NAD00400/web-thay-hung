@@ -319,6 +319,8 @@ main()
 // npx prisma db pull để pull schema từ cơ sở dữ liệu
 
 
+// gio lam tiep xong commit lai  
+
 
 
 

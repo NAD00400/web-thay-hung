@@ -337,6 +337,43 @@ export default function TrangThanhToanVaGioHang() {
   
   
   return (
+<<<<<<< HEAD
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {cartItems.length > 0 ? (
+          cartItems.map((item) => (
+            <Card key={item.ma_chi_tiet_gio_hang} className="shadow-lg">
+              <CardHeader>
+                <CardTitle>{item.san_pham.ten_san_pham}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <img
+                  src={item.san_pham.url_image}
+                  alt={item.san_pham.ten_san_pham}
+                  className="w-full h-64 object-cover"
+                />
+                <p>
+                  Giá: {item.san_pham.gia_tien.toLocaleString()} VND
+                </p>
+                <p>Số lượng: {item.so_luong}</p>
+              </CardContent>
+              <CardFooter>
+                <CartActions itemId={parseInt(item.ma_chi_tiet_gio_hang, 10)} />
+              </CardFooter>
+            </Card>
+          ))
+        ) : (
+          <p className="text-center text-gray-500 col-span-full">Giỏ hàng trống</p>
+        )}
+      </div>
+      <div className="mt-6 p-4 border-t">
+        <h2 className="text-xl font-semibold">
+          Tổng cộng: {totalPrice.toLocaleString()} VND
+        </h2>
+        {cartItems.length > 0 && <CartActions isCheckout />}
+      </div>
+    </>
+=======
     <div
       className="container mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-2 gap-8 "
     >
@@ -609,5 +646,6 @@ export default function TrangThanhToanVaGioHang() {
         </div>
       </motion.section>
     </div>
+>>>>>>> aDuy
   );
 }
