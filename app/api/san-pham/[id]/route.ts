@@ -46,22 +46,58 @@ export async function PUT(req: NextRequest, { params }: { params: { 'ma-san-pham
         });
 
         return NextResponse.json(updatedProduct);
-    } catch (error) {
+    } 
+    catch(error) {
         return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
     }
 }
 
 // DELETE API: Delete a product by its ID
-export async function DELETE(req: NextRequest, { params }: { params: { 'ma-san-pham': string } }) {
+// DELETE: /api/san-pham/[ma-san-pham]
+export async function DELETE(
+    req: NextRequest,
+    { params }: { params: { 'ma-san-pham': string } }
+  ) {
     const { 'ma-san-pham': maSanPham } = params;
-
+  
     try {
-        await prisma.sanPhamDatMay.delete({
-            where: { ma_san_pham_dat_may: maSanPham },
-        });
-
-        return NextResponse.json({ message: 'Product deleted successfully' });
+      // Kiểm tra xem có đơn hàng nào chứa sản phẩm không
+      const chiTietDonHangs = await prisma.chiTietDonHang.findMany({
+        where: {
+          ma_san_pham: maSanPham,
+        },
+        include: {
+          don_hang: {
+            include: {
+              khach_hang: true,
+            },
+          },
+        },
+      });
+  
+      if (chiTietDonHangs.length > 0) {
+        return NextResponse.json(
+          {
+            error: 'Sản phẩm đang nằm trong đơn hàng',
+            soLuongDonHang: chiTietDonHangs.length,
+            danhSachDonHang: chiTietDonHangs.map((ct) => ({
+              maDonHang: ct.ma_don_hang,
+              tenKhachHang: ct.don_hang.khach_hang.ten_khach_hang,
+            })),
+          },
+          { status: 400 }
+        );
+      }
+  
+      // Nếu không nằm trong đơn hàng thì xóa
+      await prisma.sanPhamDatMay.delete({
+        where: { ma_san_pham_dat_may: maSanPham },
+      });
+  
+      return NextResponse.json({ message: 'Xóa sản phẩm thành công' });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
+      console.error('[DELETE ERROR]', error);
+      return NextResponse.json({ error: 'Lỗi khi xóa sản phẩm' }, { status: 500 });
     }
-}
+  }
+  

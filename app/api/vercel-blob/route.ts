@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     const file = maybeFile as File;
     // put(name, file, { access })
-    const blob = await put(file.name, file, { access: 'public' });
+    const blob = await put(`sanPham/${file.name}`, file, { access: 'public' });
 
     return NextResponse.json({ url: blob.url });
   } catch (err) {

@@ -86,7 +86,7 @@ export default function DonHangTable({ dataOrder }: DonHangTableProps) {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Danh sách đơn hàng</h2>
+        <h2 className="text-xl font-semibold text-white">Danh sách đơn hàng</h2>
         <Button onClick={() => {
           setMode('create');
           reset(); // Clear form
