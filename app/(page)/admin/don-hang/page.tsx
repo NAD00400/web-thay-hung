@@ -1,16 +1,11 @@
-
-
 import DonHangTable from "@/app/components/donhang/donhang.table";
-import { fetchDonHang} from "@/app/lib/fetchData";
-
-
-
+import {fetchKhachHang, fetchSanPham} from "@/app/lib/fetchData";
 export default async function OrderManagementPage (){
-  
-  const dataOrder = await fetchDonHang();
+  const dataSp = await fetchSanPham();
+  const dataKh= await fetchKhachHang();
   return(
     <>
-      <DonHangTable dataOrder={dataOrder}></DonHangTable>
+      <DonHangTable  dataSp={dataSp} dataKh={dataKh}></DonHangTable>
     </>
   )
   

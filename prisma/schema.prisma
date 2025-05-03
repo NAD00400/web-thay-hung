@@ -87,7 +87,7 @@ model HoaDon {
 model KhachHang {
   ma_khach_hang      String             @id @default(uuid())
   ma_nguoi_dung      String?            @unique  // Trường này nullable, có thể chứa giá trị null
-  so_dien_thoai      String
+  so_dien_thoai      String             @unique
   dia_chi_khach_hang String
   ten_khach_hang     String             @default("Unknown")
   don_hang           DonHang[]          // Mối quan hệ với bảng DonHang
@@ -99,12 +99,12 @@ model KhachHang {
 
 
 model LichHenKhachHang {
-  ma_lich_hen   String    @id @default(uuid())
-  ma_khach_hang String
-  ngay_hen      DateTime
-  ngay_tao      DateTime
-  trang_thai_lich_hen String
-  khach_hang    KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade)
+  ma_lich_hen           String    @id @default(uuid())
+  ma_khach_hang         String
+  ngay_hen              DateTime
+  ngay_tao              DateTime
+  trang_thai_lich_hen   String
+  khach_hang            KhachHang @relation(fields: [ma_khach_hang], references: [ma_khach_hang], onDelete: Cascade)
 }
 
 model NguoiDung {

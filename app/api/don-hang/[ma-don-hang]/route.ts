@@ -40,8 +40,8 @@ export async function GET(req: NextRequest) {
 // DELETE API Route
 export async function DELETE(req: NextRequest, { params }: { params: { "ma-don-hang": string } }) {
     const { "ma-don-hang": maDonHang} = params; 
-    await prisma.danhMuc.delete({
-                where: { ma_danh_muc: maDonHang as string },
+    await prisma.donHang.delete({
+                where: { ma_don_hang: maDonHang as string },
             });
     return NextResponse.json({ message: `Order ${maDonHang} deleted successfully` }, { status: 200 });
 }

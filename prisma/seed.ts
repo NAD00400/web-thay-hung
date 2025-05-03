@@ -49,14 +49,14 @@ async function main() {
     data: {
       ten_danh_muc: "Áo Dài Dự Tiệc",
       danh_muc_slug: "ao-dai-du-tiec",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741080079627-45ac4fca9da52cfb75b416-FzDLX4N5wHQLPhCszO2VAUaWKJOmLE.jpg",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/3cb9662ca543141d4d5211-CWpWJ4SCKcBXqZjMIAZkfJ1RumFlLk.jpg",
     },
   });
   const category2 = await prisma.danhMuc.create({
     data: {
       ten_danh_muc: "Áo Dài Học Sinh",
       danh_muc_slug: "ao-dai-hoc-sinh",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741079928611-z6373043504339_0b29b2c61362b8f301f145970af6e5ad-wkyfFCwJJxKuGPV0oeZUGk1PW1OlVu.jpg",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/413f43a780c8319668d912-aUUSKJIDSf8KhPS4qwl1VXyn7dpI9x.jpg",
     },
   });
 
@@ -67,7 +67,7 @@ async function main() {
       ten_san_pham: "Áo Dài Công Sở Hoa Lưu",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741069956271-DALL%C2%B7E%202025-03-03%2012.55.11%20-%20A%20polished%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20wear%2C%20crafted%20in%20a%20deep%20navy%20blue%20with%20subtle%20silver%20embroidery%20along%20the%20neckline.%20The%20design%20is%20sleek%20and%20pr-BIj71vbG1jc9osww00Rrb8Ovmazqyj.webp",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/5cfeda771918a846f10913-KFo0QSI2v8dn1ulsvjAclrqmDX1Ag5.jpg",
       co_san: false,
     },
   });
@@ -77,7 +77,7 @@ async function main() {
       ten_san_pham: "Áo Dài Công Sở Linh Ngọc",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070083254-DALL%C2%B7E%202025-03-03%2012.52.47%20-%20A%20stylish%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20professionals%2C%20featuring%20a%20soft%20pastel%20beige%20fabric%20with%20elegant%20button%20details%20along%20the%20collar.%20The%20design%20is-dCGvuyrfJTxC2ZoKMPOHFu6cUJTeeb.webp",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/92bfbd337e5ccf02964d10-Qy5BzuWCNGrK3kIqgguitEUFFiqBTI.jpg",
       co_san: false,
     },
   });
@@ -87,7 +87,7 @@ async function main() {
       ten_san_pham: "Áo Dài Công Sở Thiết Đan",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070083254-DALL%C2%B7E%202025-03-03%2012.52.47%20-%20A%20stylish%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20professionals%2C%20featuring%20a%20soft%20pastel%20beige%20fabric%20with%20elegant%20button%20details%20along%20the%20collar.%20The%20design%20is-dCGvuyrfJTxC2ZoKMPOHFu6cUJTeeb.webp",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/68b91925da4a6b14325b9-JgjcSp5ptrrbxdbYJanwvqU6CwmaML.jpg",
       co_san: false,
     },
   });
@@ -97,7 +97,7 @@ async function main() {
       ten_san_pham: "Áo Dài Công Sở Tinh Lam",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741070102958-DALL%C2%B7E%202025-03-03%2012.52.06%20-%20A%20professional%20Vietnamese%20%C3%A1o%20d%C3%A0i%20for%20office%20wear%2C%20featuring%20a%20sleek%20navy%20blue%20fabric%20with%20subtle%20pinstripes.%20The%20design%20is%20modern%20with%20a%20tailored%20fit%2C-UtsKY2lRhRre9OUhd42dmS508Rl98R.webp",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/92bfbd337e5ccf02964d10-Qy5BzuWCNGrK3kIqgguitEUFFiqBTI.jpg",
       co_san: false,
     },
   });
@@ -107,7 +107,7 @@ async function main() {
       ten_san_pham: "Áo Dài Truyền Thống Tinh Vân ",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741079937955-z6373043504341_2a67ee32cb4ed57869fd13d8ae2f6ddf-oJ8EHuu1c6gW0L8Uf1uwwiDd0hC8OK.jpg",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/d0b8322bf144401a195515-rvWEgcAqmj25owHhBtIukcRGTHAlEz.jpg",
       co_san: false,
     },
   });
@@ -117,63 +117,11 @@ async function main() {
       ten_san_pham: "Áo Dài Học Sinh",
       gia_tien: 500000,
       mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741079928611-z6373043504339_0b29b2c61362b8f301f145970af6e5ad-wkyfFCwJJxKuGPV0oeZUGk1PW1OlVu.jpg",
+      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/sanPham/edfa88754b1afa44a30b14-7F1ix0OXCiuHffxTU2n4zuACnP3fbG.jpg",
       co_san: false,
     },
   });
-  await prisma.sanPhamDatMay.create({
-    data: {
-      ma_danh_muc: category2.ma_danh_muc,
-      ten_san_pham: "Áo Dài Học Sinh",
-      gia_tien: 500000,
-      mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741079919159-z6373043489499_4b7dca4eb51f58baae17533c8075cd7f-tQOMZUCSiA4MPm7XU6AXmGj0BQuqfv.jpg",
-      co_san: false,
-    },
-  });
-  await prisma.sanPhamDatMay.create({
-    data: {
-      ma_danh_muc: category2.ma_danh_muc,
-      ten_san_pham: "Áo Dài Học Sinh",
-      gia_tien: 500000,
-      mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741079944923-z6373043504342_2abb83d0bb63e6fa774ae73591adb463-Nlw7ezTEXqn81G9JmJgeVsoxoSeo9j.jpg",
-      co_san: false,
-    },
-  })
-  await prisma.sanPhamDatMay.create({
-    data: {
-      ma_danh_muc: category1.ma_danh_muc,
-      ten_san_pham: "Áo Dài Dự Tiệc",
-      gia_tien: 500000,
-      mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/cbb3f88eeae05bbe02f17-KVh00o0dAXSx1TH7ZbWsooxAbMJute.jpg",
-      co_san: false,
-    },
-  });
-  await prisma.sanPhamDatMay.create({
-    data: {
-      ma_danh_muc: category1.ma_danh_muc,
-      ten_san_pham: "Áo Dài Truyền Thống",
-      gia_tien: 500000,
-      mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/e72a9f428d2c3c72653d1-rzujI8IFfBW5wvv0FNY9XGQtKxLpiC.jpg",
-      co_san: false,
-    },
-  });
-  await prisma.sanPhamDatMay.create({
-    data: {
-      ma_danh_muc: category1.ma_danh_muc,
-      ten_san_pham: "Áo Dài Tiệc Cưới",
-      gia_tien: 500000,
-      mo_ta_san_pham: "Áo dài truyền thống Việt Nam",
-      url_image: "https://brojqgdjcljbprhn.public.blob.vercel-storage.com/products/1741080079627-45ac4fca9da52cfb75b416-FzDLX4N5wHQLPhCszO2VAUaWKJOmLE.jpg",
-      co_san: false,
-    },
-  });
-
   
-
   // 🌱 Tạo giỏ hàng
   const cart = await prisma.gioHang.create({
     data: {
