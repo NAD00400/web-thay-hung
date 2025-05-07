@@ -53,7 +53,7 @@ const HeaderComponent: React.FC = () => {
       
       <header className="py-4 opacity-70 fixed top-0 left-0 w-full backdrop-blur-md z-50 transition-all duration-300" 
       style={{
-        backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/background/ChatGPT%20Image%2018_52_55%2020%20thg%204%2C%202025-7Vo8MBW1HHSxLyxsE7eQAsnxIoSwJC.png')",
+        backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/imgBg/vibrant-liquid-wavy-background-3d-illustration-abstract-iridescent-fluid-render-neon-holographic-smooth-surface-with-colorful-interference-stylish-spectrum-flow-motion-It87UUpTtxvIn7SKkuFrNfu4d2Mi2m.jpg')",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
       }}>

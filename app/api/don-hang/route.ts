@@ -9,13 +9,9 @@ export async function GET(req: NextRequest) {
             ma_don_hang: true,
             ngay_dat_hang: true,
             trang_thai_don_hang: true,
-            khach_hang: {
-              select: {
-                ten_khach_hang: true,
-                dia_chi_khach_hang: true,
-                so_dien_thoai: true,
-              },
-            },
+            ghi_chu: true,
+            ngay_cap_nhat: true,
+            ma_khach_hang: true,
           },
           orderBy: { ngay_dat_hang: 'desc' },
         });

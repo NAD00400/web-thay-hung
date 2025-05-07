@@ -29,7 +29,7 @@ export const fetchSanPhamChiTiet = (id: string) => fetchData(`/api/san-pham/${id
 export const fetchDonHang = () => fetchData('/api/don-hang');
 export const fetchDonHangChiTiet = (id: string) => fetchData(`/api/don-hang/${id}`);
 
-export const fetchKhachHang = () => fetchData('/api/khach-hang');
+export const fetchKhachHang = (ma_khach_hang: string) => fetchData('/api/khach-hang');
 export const fetchLichHen = () => fetchData('/api/lich-hen');
 export const fetchNguoiDung = () => fetchData('/api/nguoi-dung');
 export const fetchPhuLieu = () => fetchData('/api/phu-lieu');

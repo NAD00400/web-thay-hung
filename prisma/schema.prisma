@@ -53,6 +53,7 @@ model DonHang {
 model GiaoHang {
   ma_giao_hang      String    @id @default(uuid())
   ma_don_hang       String    @unique
+  
   phi_van_chuyen    Float
   dia_chi_giao_hang String
   ngay_giao_du_kien DateTime?

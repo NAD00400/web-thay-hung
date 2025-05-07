@@ -19,7 +19,7 @@ export default function Home() {
       {/* Hero Section */}
       <section 
           className="relative text-white text-center bg-cover bg-center h-screen flex flex-col justify-center items-center"
-          style={{ backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/background/z6454049196361_946d115cd94d2e5f3f85f84dc551a230-UDCnYr7aN9TvVcWOFxSNH02FPuw4UD.jpg')" }}>
+          style={{ backgroundImage: "url('https://brojqgdjcljbprhn.public.blob.vercel-storage.com/imgBg/ChatGPT%20Image%2021_05_21%207%20thg%205%2C%202025-3ecSZ9MRUH7qSQXiVo9Tj8O5ZhOWZI.png')" }}>
         <div className="sticky top-0 left-0 w-full">
                 
                 <p className="mt-4 text-2xl text-neutral-600 ">We provide the best solutions for your needs.</p>
@@ -29,10 +29,10 @@ export default function Home() {
         </div>
       </section>
       <StorySection />
-
+      <ContactSection /> 
       <BookingSection />
       
-      <ContactSection />
+      
       
     </div>
   </>
